@@ -34,7 +34,7 @@ To secure a position in a reputable organization where I can effectively contrib
 - Experience with MS Word and Excel  
 - Basic Coding Skills  
 - Operating Systems Installation  
-- Experience with cloud-like MediaFire, Google Drive, US, Dropden, etc.  
+- Experience with cloud-like MediaFire, Google Drive, Dropden, etc.  
 - Understanding of Data Backup and Recovery  
 
 ---
@@ -83,3 +83,6 @@ Bunakan, Madridejos Cebu
 - English 
 - Tagalog
 - Bisaya (Native)
+
+
+> [Download the resume PDF](https://www.mediafire.com/file/vepluwndndltbc9/resume-jade.pdf/file)
