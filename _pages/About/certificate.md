@@ -4,7 +4,7 @@ tags:
     - 🏅
     - 🏆
 date: "2025-05-01"
-thumbnail: "/assets/img/poisk-ls.png"
+thumbnail: "/assets/img/cert.png"
 ---
 
 
