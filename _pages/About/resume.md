@@ -1,8 +1,7 @@
 ---
 title: "Resume"
 tags:
-    - 🏅
-    - 🏆
+    - 📝
 date: "2025-05-02"
 thumbnail: "/assets/img/res.png"
 ---
