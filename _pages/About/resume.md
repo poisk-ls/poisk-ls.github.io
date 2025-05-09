@@ -16,7 +16,7 @@ thumbnail: "/assets/img/res.png"
 
 **Phone:** (+63) 905-2877-252  
 **Email:** buhayanjadenelsonn@gmail.com  
- [linked](https://inkedin.com/in/poisk-ls) / [Github](https://github.com/poisk-ls)
+ [linked](https://linkedin.com/in/poisk-ls) / [Github](https://github.com/poisk-ls)
 
 ---
 
