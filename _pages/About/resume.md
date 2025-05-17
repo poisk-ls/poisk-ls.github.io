@@ -14,8 +14,8 @@ thumbnail: "/assets/img/res.png"
 
 ## GET IN TOUCH
 
-**Phone:** (+63) 905-2877-252  
-**Email:** buhayanjadenelsonn@gmail.com  
+**Phone:** [+63 905-2877-252](tel:09052877252)  
+**Email:** [buhayanjade@gmail.com](mailto:buhayanjadenelsonn@gmail.com)  
  [linked](https://linkedin.com/in/poisk-ls) / [Github](https://github.com/poisk-ls)
 
 ---
