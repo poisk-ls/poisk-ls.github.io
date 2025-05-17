@@ -85,4 +85,9 @@ Bunakan, Madridejos Cebu
 - Bisaya (Native)
 
 
-> [Download the resume PDF](https://www.mediafire.com/file/mdiwc4e70ou28e3/resume-jade.pdf/file)
+<!-- > [Download the resume PDF](https://www.mediafire.com/file/vepluwndndltbc9/resume-jade.pdf/file) -->
+
+><details>
+><summary>Download the Resume PDF</summary>
+><iframe src="https://drive.google.com/file/d/1-yXYEIcPPRTId-6NPDTlqatQpYJqzGq0/preview" width="340" height="480" allow="autoplay"></iframe>
+></details>
