@@ -14,9 +14,9 @@ thumbnail: "/assets/img/res.png"
 
 ## GET IN TOUCH
 
-**Phone:** [+63 905-2877-252](tel:09052877252)  
-**Email:** [buhayanjade@gmail.com](mailto:buhayanjadenelsonn@gmail.com)  
- [linked](https://linkedin.com/in/poisk-ls) / [Github](https://github.com/poisk-ls)
+**Phone:** [+63 905-2877-252](tel:09052877252)
+**Mail me at:** [buhayanjade@gmail.com](mailto:buhayanjadenelsonn@gmail.com)
+ [linked](https://inkedin.com/in/poisk-ls) / [Github](https://github.com/poisk-ls)
 
 ---
 
@@ -34,7 +34,7 @@ To secure a position in a reputable organization where I can effectively contrib
 - Experience with MS Word and Excel  
 - Basic Coding Skills  
 - Operating Systems Installation  
-- Experience with cloud-like MediaFire, Google Drive, Dropden, etc.  
+- Experience with cloud-like MediaFire, Google Drive, US, Dropden, etc.  
 - Understanding of Data Backup and Recovery  
 
 ---
@@ -54,7 +54,7 @@ To secure a position in a reputable organization where I can effectively contrib
 ## EXPERIENCE
 
 **Fast Services Corporation**
-*1 year and 2 months - Present*
+*0 year and 12mos — Present*
 - Responsible for picking items accurately according to orders  
 - Provided support to the Outbound Encoder Department during the peak season in December  
 - Voluntarily contributed to managing the increased workload  
@@ -80,14 +80,13 @@ Bunakan, Madridejos Cebu
 
 ## LANGUAGES
 
-- English 
-- Tagalog
-- Bisaya (Native)
+- English ★★☆☆☆
+- Tagalog ★★★☆☆
+- Bisaya  ★★★★★
 
 
 <!-- > [Download the resume PDF](https://www.mediafire.com/file/vepluwndndltbc9/resume-jade.pdf/file) -->
 
-><details>
-><summary>Download the Resume PDF</summary>
-><iframe src="https://drive.google.com/file/d/1-yXYEIcPPRTId-6NPDTlqatQpYJqzGq0/preview" width="340" height="480" allow="autoplay"></iframe>
-></details>
+
+>View | Download the Resume PDF
+><iframe src="https://drive.google.com/file/d/1-yXYEIcPPRTId-6NPDTlqatQpYJqzGq0/preview" style="border: none; width: 800px; max-width: 100%; height: 600px; max-height: 100%; border-radius: 8px;" allowfullscreen></iframe>
