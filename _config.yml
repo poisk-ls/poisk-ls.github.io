@@ -19,7 +19,7 @@ giscus_repoId: "R_kgDOOiPjMg"
 giscus_category: "Blog Comments"
 giscus_categoryId: "44467258"
 goatcounter_code: poisk-ls
-google_analytics:
+google_analytics: G-SJ97VTB0GY
 
 # If your repo name follows the format "<user-name>.github.io", then leave the below blank.
 # Otherwise, set its value as "/<repo-name>". ex) baseurl: /myblog
