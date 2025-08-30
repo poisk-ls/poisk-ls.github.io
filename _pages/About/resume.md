@@ -89,4 +89,4 @@ Bunakan, Madridejos Cebu
 
 
 >View | Download the Resume PDF
-><iframe src="https://drive.google.com/file/d/1-yXYEIcPPRTId-6NPDTlqatQpYJqzGq0/preview" style="border: none; width: 800px; max-width: 100%; height: 600px; max-height: 100%; border-radius: 8px;" allowfullscreen></iframe>
+><iframe src="https://drive.google.com/drive/folders/1-BwofmtsL_QVnk2rL4N5sdj1wRyaPXjG" style="border: none; width: 800px; max-width: 100%; height: 600px; max-height: 100%; border-radius: 8px;" allowfullscreen></iframe>
