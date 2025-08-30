@@ -54,7 +54,7 @@ To secure a position in a reputable organization where I can effectively contrib
 ## EXPERIENCE
 
 **Fast Services Corporation**
-*0 year and 12mos — Present*
+*1year & 2mos — Present*
 - Responsible for picking items accurately according to orders  
 - Provided support to the Outbound Encoder Department during the peak season in December  
 - Voluntarily contributed to managing the increased workload  
