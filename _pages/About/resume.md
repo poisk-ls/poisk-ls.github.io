@@ -88,5 +88,17 @@ Bunakan, Madridejos Cebu
 <!-- > [Download the resume PDF](https://www.mediafire.com/file/vepluwndndltbc9/resume-jade.pdf/file) -->
 
 
->View | Download the Resume PDF
-><iframe src="https://drive.google.com/file/d/1fV0oIeOCzsKZvoH_iJ15QBPGoPzA_dLE/view?usp=drivesdk" style="border: none; width: 800px; max-width: 100%; height: 600px; max-height: 100%; border-radius: 8px;" allowfullscreen></iframe>
+
+<!-- Download button -->
+<a href="https://drive.google.com/uc?export=download&id=1fV0oIeOCzsKZvoH_iJ15QBPGoPzA_dLE" 
+   download 
+   style="display: inline-block; margin-bottom: 12px; padding: 10px 18px; background: #007BFF; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">
+  ⬇️ Download Resume PDF
+</a>
+
+<!-- Embedded preview -->
+<iframe 
+  src="https://drive.google.com/file/d/1fV0oIeOCzsKZvoH_iJ15QBPGoPzA_dLE/preview" 
+  style="border: none; width: 800px; max-width: 100%; height: 600px; max-height: 100%; border-radius: 8px;" 
+  allowfullscreen>
+</iframe>
