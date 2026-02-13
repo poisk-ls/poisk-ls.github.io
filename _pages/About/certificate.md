@@ -19,4 +19,4 @@ thumbnail: "/assets/img/cert.png"
 
 > 🏷️ IT intern — Maintain Grading System
 
-> 🏷️ Outbound Encoder Assisting @FSC
+> 🏷️ Outbound Encoder
