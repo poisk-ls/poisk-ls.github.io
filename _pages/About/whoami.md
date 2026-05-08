@@ -6,8 +6,6 @@ date: "2025-05-01"
 thumbnail: "/assets/img/poisk-ls.png"
 ---
 
-<img src="/assets/img/poisk-ls.jpg" width="100" height="100" alt="profile">
-
 ![Jade Nelson N. Buhayan](/assets/img/poisk-ls.jpg "poisk-ls")
 
 # Hello there! ^_^
