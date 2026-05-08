@@ -1,7 +1,7 @@
 ---
 title: "WHOAM—Ī"
 tags:
-    - poisk-ls 🇵🇭
+    - poisk-sls 🇵🇭
 date: "2025-05-01"
 thumbnail: "/assets/img/poisk-ls.png"
 ---
