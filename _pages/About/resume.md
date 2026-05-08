@@ -10,7 +10,7 @@ thumbnail: "/assets/img/res.png"
 
 ---
 
-![Jade Nelson N. Buhayan](/assets/img/profile.webp){: width="50%" }
+![Jade Nelson N. Buhayan](/assets/img/profile.webp){: width="10%" }
 
 ## GET IN TOUCH
 
