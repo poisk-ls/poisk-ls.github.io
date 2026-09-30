@@ -2098,7 +2098,7 @@ and
 @media (max-width:1024px) {
   .top-arrow {
     right:var(--mobile-edge-space);
-    bottom:calc(var(--mobile-floating-bottom) + var(--mobile-tawk-size) + var(--mobile-floating-gap));
+    bottom:calc(var(--mobile-floating-bottom) + var(--mobile-floating-gap));
   }
 }
 
@@ -2113,7 +2113,7 @@ and
     width:var(--floating-control-size);
     height:var(--floating-control-size);
     right:var(--mobile-edge-space);
-    bottom:calc(var(--mobile-floating-bottom) + var(--mobile-tawk-size) + var(--mobile-floating-gap));
+    bottom:calc(var(--mobile-floating-bottom) + var(--mobile-floating-gap));
   }
   .top-arrow::before {
     width:36px;
@@ -3032,7 +3032,6 @@ surfaces and motion. */
   --mobile-edge-space: 12px;
   --mobile-safe-bottom: env(safe-area-inset-bottom, 0px);
   --mobile-floating-gap: 12px;
-  --mobile-tawk-size: 0px;
   --mobile-floating-bottom: calc(var(--mobile-safe-bottom) + var(--mobile-edge-space));
   --stack-content: 1;
   --stack-sidebar: 1100;
@@ -3084,12 +3083,6 @@ body {
   min-width: 0;
   overflow-x: hidden;
   transition: background-color var(--motion-normal) ease, color var(--motion-normal) ease;
-}
-
-@media (max-width:1024px) {
-  [data-mobile-floating-control="tawk"] {
-    bottom:var(--mobile-floating-bottom);
-  }
 }
 
 .sr-only {
@@ -3258,5 +3251,128 @@ body {
   #backToTop, #back-to-top, .back-to-top, .backToTop {
     right: max(24px, env(safe-area-inset-right));
     bottom: max(24px, env(safe-area-inset-bottom));
+  }
+}
+
+
+/* ==========================================================================
+   Sidebar refinements
+   ========================================================================== */
+
+/* Nav: collapsed submenus must not reserve space. The tree grid only defined
+   one row track (0fr), so 2nd+ children of a collapsed parent (e.g. the three
+   pages under About) created auto rows that stayed in the layout and pushed
+   "Terminal" down. Collapse every implicit row too. */
+.nav-tree-node > .nav-tree-children {
+  grid-auto-rows:0;
+}
+.nav-tree-node.is-expanded > .nav-tree-children,
+.nav-tree-node.is-active > .nav-tree-children {
+  grid-auto-rows:auto;
+}
+.nav-tree-node > .nav-item {
+  align-items:center;
+}
+.nav-tree-node > .nav-item .nav-list-link {
+  align-items:center;
+  line-height:1.35;
+}
+.nav-tree-node > .nav-item .nav-tree-icon,
+.nav-tree-node > .nav-item .nav-list-expander {
+  align-self:center;
+}
+
+/* Drawer header now only holds the close button. */
+.sidebar-drawer-header {
+  justify-content:flex-end;
+}
+
+/* Search + Theme: icon-only controls. */
+.sidebar-utility {
+  padding:10px 0;
+}
+.sidebar-action {
+  justify-content:center;
+  gap:0;
+  padding:8px;
+}
+.sidebar-action-icon {
+  flex:0 0 22px;
+  width:22px;
+  height:22px;
+}
+.sidebar-action-icon i {
+  font-size:1.1rem;
+}
+
+/* Theme control shows only the active theme's icon (dark = moon only). */
+html[data-theme="dark"] .sidebar-action-icon .ico-dark,
+html[data-theme="light"] .sidebar-action-icon .ico-light {
+  display:block;
+}
+html[data-theme="dark"] .sidebar-action-icon .ico-light,
+html[data-theme="light"] .sidebar-action-icon .ico-dark {
+  display:none;
+}
+html[data-theme="dark"] {
+  background:#05070a;
+}
+
+/* ==========================================================================
+   Back-to-top button (mobile + desktop)
+   ========================================================================== */
+:root {
+  --floating-control-size: 48px;
+}
+.top-arrow {
+  position:fixed;
+  left:auto;
+  top:auto;
+  right:max(16px, env(safe-area-inset-right, 0px));
+  bottom:max(16px, env(safe-area-inset-bottom, 0px));
+  width:var(--floating-control-size);
+  height:var(--floating-control-size);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  box-sizing:border-box;
+  border-radius:50%;
+  color:var(--color-accent);
+  cursor:pointer;
+  z-index:1000;
+  touch-action:manipulation;
+  -webkit-user-select:none;
+  user-select:none;
+}
+.top-arrow.arrow-open {
+  display:flex;
+}
+.top-arrow::before {
+  inset:3px;
+  width:auto;
+  height:auto;
+  top:3px;
+  left:3px;
+  pointer-events:none;
+  box-sizing:border-box;
+}
+.top-arrow i {
+  position:relative;
+  display:block;
+  font-size:1.2rem;
+  line-height:1;
+  pointer-events:none;
+}
+@media (min-width:1025px) {
+  .top-arrow {
+    right:max(24px, env(safe-area-inset-right, 0px));
+    bottom:max(24px, env(safe-area-inset-bottom, 0px));
+  }
+}
+@media (max-width:1024px) {
+  .top-arrow {
+    right:max(var(--mobile-edge-space), env(safe-area-inset-right, 0px));
+    bottom:var(--mobile-floating-bottom);
   }
 }
