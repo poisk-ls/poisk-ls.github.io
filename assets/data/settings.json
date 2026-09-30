@@ -1,0 +1,18 @@
+{
+  "theme": {
+    "selected": "dark",
+    "options": [
+      "dark",
+      "light"
+    ]
+  },
+  "pagination": {
+    "itemsPerPage": 5
+  },
+  "search": {
+    "index": "/assets/data/search-index.json"
+  },
+  "viewer": {
+    "maxScale": 4
+  }
+}

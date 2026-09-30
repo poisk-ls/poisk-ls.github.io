@@ -1,0 +1,199 @@
+[
+  {
+    "title": "About",
+    "path": "About",
+    "type": "category",
+    "tags": "",
+    "tagList": [],
+    "url": "/pages/about.html",
+    "image": "/assets/img/thumbnail/empty.jpg",
+    "date": "2025-01-01",
+    "description": "",
+    "excerpt": ""
+  },
+  {
+    "title": "CMD",
+    "path": "Terminal > CMD",
+    "type": "category",
+    "tags": "",
+    "tagList": [],
+    "url": "/pages/terminal-cmd.html",
+    "image": "/assets/img/thumbnail/empty.jpg",
+    "date": "2025-01-01",
+    "description": "",
+    "excerpt": ""
+  },
+  {
+    "title": "Repo",
+    "path": "Terminal > Repo",
+    "type": "category",
+    "tags": "",
+    "tagList": [],
+    "url": "/pages/terminal-repo.html",
+    "image": "/assets/img/thumbnail/empty.jpg",
+    "date": "2025-01-01",
+    "description": "",
+    "excerpt": ""
+  },
+  {
+    "title": "Terminal",
+    "path": "Terminal",
+    "type": "category",
+    "tags": "",
+    "tagList": [],
+    "url": "/pages/terminal.html",
+    "image": "/assets/img/thumbnail/empty.jpg",
+    "date": "2025-01-01",
+    "description": "",
+    "excerpt": ""
+  },
+  {
+    "title": "Certificate | Exp",
+    "url": "/pages/about-certificate.html",
+    "path": "About",
+    "type": "post",
+    "tags": "🏅, 🏆",
+    "tagList": [
+      "🏅",
+      "🏆"
+    ],
+    "date": "2025-05-01",
+    "image": "/assets/img/cert.webp",
+    "description": "",
+    "excerpt": "My Certification &amp; Exp 🏷️ Participation on Database 🏷️ Tesda Training NCII — Call Center 🏷️ Maintaining Perfect Attendace @FSC 🏷️ IT intern — Maintain Grading System 🏷️ Outbound Encoder"
+  },
+  {
+    "title": "Resume",
+    "url": "/pages/about-resume.html",
+    "path": "About",
+    "type": "post",
+    "tags": "📝",
+    "tagList": [
+      "📝"
+    ],
+    "date": "2025-05-02",
+    "image": "/assets/img/res.png",
+    "description": "",
+    "excerpt": "Jade Nelson N. Buhayan GET IN TOUCH Phone: +63 905-2877-252 Mail me at: buhayanjade@gmail.com linked / Github OBJECTIVES To secure a position in a reputable organization where I can effectively contribute my skills, knowledge, and abilities while demonstrating my commitment and strong work ethic. I aim to grow professionally and contribute to the organization’s success through dedication and continuous development. TECHNICAL SKILLS Basic understanding of Linux command Windows/MS Office Activation Tools , Databases Software Installation and Configuration Experience with MS Word and Excel Basic "
+  },
+  {
+    "title": "WHOAM—Ī",
+    "url": "/pages/about-whoami.html",
+    "path": "About",
+    "type": "post",
+    "tags": "poisk-sls 🇵🇭",
+    "tagList": [
+      "poisk-sls 🇵🇭"
+    ],
+    "date": "2025-05-01",
+    "image": "/assets/img/poisk-ls-avatar.webp",
+    "description": "",
+    "excerpt": "Hello there! ^_^ I'm Jade Nelson N. Buhayan I’m someone who values consistency, growth, and staying grounded in every step I take. I’ve always believed that showing up with purpose matters more than making noise. I stay calm under pressure, listen more than I speak, and work best when I’m focused on a goal with a clear path forward. I have a natural curiosity for technology and a deep respect for process, precision, and learning. Whether it's diving into software systems, supporting a team, or simply figuring out the most efficient way to solve a problem—I do it with patience and care. My stre"
+  },
+  {
+    "title": "Jade-CMD",
+    "url": "/pages/terminal-cmd-post-01-jadecmd.html",
+    "path": "Terminal > CMD",
+    "type": "post",
+    "tags": "cmd, terminal, installation",
+    "tagList": [
+      "cmd",
+      "terminal",
+      "installation"
+    ],
+    "date": "2025-05-02",
+    "image": "/assets/img/jcmd.jpg",
+    "description": "",
+    "excerpt": "Full packages installation command for Termux users, install this command in one click. Use: pkg/pip install command_name PKG Installation PIP Installation python requests python2 mechanize git lolcat pythin rich python2 wget fish beautifulsoup4 perl wheel toilet futures zip bs4 unzip npm figlet colorama clang socket For more info; visit here ---&gt; jade-cmd"
+  },
+  {
+    "title": "Poisk-AI",
+    "url": "/pages/terminal-repo-post-01-poisk-ai.html",
+    "path": "Terminal > Repo",
+    "type": "post",
+    "tags": "ai, prompt",
+    "tagList": [
+      "ai",
+      "prompt"
+    ],
+    "date": "2025-05-03",
+    "image": "/assets/img/boss.jpg",
+    "description": "",
+    "excerpt": "Update the package list `pkg update` Upgrade all installed packages `pkg upgrade` Install Git (version control tool) `pkg install git` Install the Ruby programming language `pkg install ruby` Clear the terminal screen `clear` Clone a repository from GitHub `git clone https://github.com/poisk-ls/Pro-AI.git` List files in the current directory `ls` Select directory `cd Pro-AI` `ls` Install Python dependencies from the requirements file `pip install -r requirements.txt` Check available files after installing dependencies `ls` Run the install script `bash install.sh` List files after installation "
+  },
+  {
+    "title": "Best-Modded-Site",
+    "url": "/pages/terminal-repo-post-02-bms.html",
+    "path": "Terminal > Repo",
+    "type": "post",
+    "tags": "moded, site",
+    "tagList": [
+      "moded",
+      "site"
+    ],
+    "date": "2025-05-03",
+    "image": "/assets/img/bms.jpg",
+    "description": "",
+    "excerpt": "- All mod Games and Apk are completely safe and free, so you can download here.. Best Premuim | Modded site for Games &amp; Apps https://apkmody.io https://modcombo.com https://happymod.com https://modyolo.com https://www.luckymodapk.com https://an1.com https://getmodsapk.com https://moddroid.com https://modded-1.com https://techbigs.com https://apktodo.com ttps://m.playmods.net https://modradar.net https://apkmodule.com https://modhello.com For more info; visit here ---&gt; best-modded-site"
+  },
+  {
+    "title": "My Game/Apps Collection",
+    "url": "/pages/terminal-repo-post-03-mod-ap.html",
+    "path": "Terminal > Repo",
+    "type": "post",
+    "tags": "mod, collection",
+    "tagList": [
+      "mod",
+      "collection"
+    ],
+    "date": "2025-05-06",
+    "image": "/assets/img/ags.jpg",
+    "description": "",
+    "excerpt": "Cracked Programs Tested 💯 Offline Games/Apps ✔️ Modded/Not ✔️ No Ads ✔️ For more info; visit here ---&gt; best-modded-site"
+  },
+  {
+    "title": "Welcome Voice",
+    "url": "/pages/terminal-repo-post-04-wv.html",
+    "path": "Terminal > Repo",
+    "type": "post",
+    "tags": "cmd, terminal",
+    "tagList": [
+      "cmd",
+      "terminal"
+    ],
+    "date": "2025-05-04",
+    "image": "/assets/img/wv.jpg",
+    "description": "",
+    "excerpt": "This will customize your Termux with voice AI assistant and add Banner in your termux home page. Basic Installation Guide apt-get update -y apt-get upgrade -y pkg install mpv -y pkg install neofetch -y pkg install cmatrix -y pkg install libcaca -y For more info; visit here ---&gt; Welcome Voice"
+  },
+  {
+    "title": "Database on Terminal",
+    "url": "/pages/terminal-repo-post-05-dbt.html",
+    "path": "Terminal > Repo",
+    "type": "post",
+    "tags": "db🛢️, Android🤖",
+    "tagList": [
+      "db🛢️",
+      "Android🤖"
+    ],
+    "date": "2025-05-07",
+    "image": "/assets/img/404.jpeg",
+    "description": "",
+    "excerpt": "with the ff. command pkg update pkg upgrade pkg install mariadb run: mysql For more info; visit here ---&gt; DB Xampp🔗"
+  },
+  {
+    "title": "Awesome File Hosting Services",
+    "url": "/pages/terminal-repo-post-06-afhs.html",
+    "path": "Terminal > Repo",
+    "type": "post",
+    "tags": "site, cloud",
+    "tagList": [
+      "site",
+      "cloud"
+    ],
+    "date": "2025-06-20",
+    "image": "/assets/img/afhs.jpg",
+    "description": "",
+    "excerpt": "Awesome-File-Hosting-Services A curated list of file hosting services for sharing and storing files, including free and premium options. Service Description 1Fichier.com Secure file storage, easy sharing Rapidgator.net Fast downloads, premium file hosting Alfafile.net Reliable cloud storage, high speed Clicknupload.org Simple uploads, free file sharing Dailyuploads.net Daily backups, user-friendly interface Daofile.com Secure file hosting, fast access For more info; visit here ---&gt; Awesome-File-Hosting-Services"
+  }
+]

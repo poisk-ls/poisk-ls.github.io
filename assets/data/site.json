@@ -1,0 +1,31 @@
+{
+  "title": "ρԾɿՏƙ-ʅՏ",
+  "description": "Let me crash your reality!",
+  "logo_img": "/assets/img/favicon.webp",
+  "profile_img": "/assets/img/profile.webp",
+  "baseurl": "",
+  "analytics": {
+    "google": "G-SJ97VTB0GY",
+    "goatcounter": "poisk-ls"
+  },
+  "comments": {
+    "repo": "poisk-ls/poisk-ls.github.io",
+    "repoId": "R_kgDOOiPjMg",
+    "category": "Blog Comments",
+    "categoryId": "44467258"
+  },
+  "chat": {
+    "propertyId": "69f4efe28523f61c32f23c30",
+    "widgetId": "1jnici3gr"
+  },
+  "social": {
+    "email": "jadepoisk@gmail.com",
+    "github": "poisk-ls",
+    "twitter": "poiskls",
+    "instagram": "jadepoiskls",
+    "linkedin": "poisk-ls",
+    "facebook": "poisk-ls",
+    "discord": "https://discord.com/users/1115921763348525087",
+    "bluesky": "poisk-ls.bsky.social"
+  }
+}

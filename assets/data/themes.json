@@ -1,0 +1,15 @@
+{
+  "selected": "dark",
+  "options": [
+    {
+      "id": "dark",
+      "label": "Dark",
+      "colorScheme": "dark"
+    },
+    {
+      "id": "light",
+      "label": "Light",
+      "colorScheme": "light"
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+[
+  {
+    "label": "Home",
+    "url": "/",
+    "icon": "home",
+    "order": 1
+  },
+  {
+    "label": "About",
+    "url": "/pages/about.html",
+    "icon": "folder",
+    "order": 2,
+    "children": [
+      {
+        "label": "Certificate | Exp",
+        "url": "/pages/about-certificate.html",
+        "icon": "document",
+        "order": 1
+      },
+      {
+        "label": "Resume",
+        "url": "/pages/about-resume.html",
+        "icon": "document",
+        "order": 2
+      },
+      {
+        "label": "WHOAM—Ī",
+        "url": "/pages/about-whoami.html",
+        "icon": "document",
+        "order": 3
+      }
+    ]
+  },
+  {
+    "label": "Terminal",
+    "url": "/pages/terminal.html",
+    "icon": "terminal",
+    "order": 3,
+    "children": [
+      {
+        "label": "CMD",
+        "url": "/pages/terminal-cmd.html",
+        "icon": "terminal",
+        "order": 1,
+        "children": [
+          {
+            "label": "Jade-CMD",
+            "url": "/pages/terminal-cmd-post-01-jadecmd.html",
+            "icon": "command",
+            "order": 1
+          }
+        ]
+      },
+      {
+        "label": "Repo",
+        "url": "/pages/terminal-repo.html",
+        "icon": "folder",
+        "order": 2,
+        "children": [
+          {
+            "label": "Poisk-AI",
+            "url": "/pages/terminal-repo-post-01-poisk-ai.html",
+            "icon": "document",
+            "order": 1
+          },
+          {
+            "label": "Best-Modded-Site",
+            "url": "/pages/terminal-repo-post-02-bms.html",
+            "icon": "document",
+            "order": 2
+          },
+          {
+            "label": "My Game/Apps Collection",
+            "url": "/pages/terminal-repo-post-03-mod-ap.html",
+            "icon": "document",
+            "order": 3
+          },
+          {
+            "label": "Welcome Voice",
+            "url": "/pages/terminal-repo-post-04-wv.html",
+            "icon": "document",
+            "order": 4
+          },
+          {
+            "label": "Database on Terminal",
+            "url": "/pages/terminal-repo-post-05-dbt.html",
+            "icon": "document",
+            "order": 5
+          },
+          {
+            "label": "Awesome File Hosting Services",
+            "url": "/pages/terminal-repo-post-06-afhs.html",
+            "icon": "document",
+            "order": 6
+          }
+        ]
+      }
+    ]
+  }
+]
