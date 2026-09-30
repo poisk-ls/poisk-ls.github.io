@@ -3240,3 +3240,23 @@ body {
 /* Static migration icon compatibility: Font Awesome 6 replaces former inline SVG controls. */
 .nav-tree-icon i,.sidebar-action-icon i,.sidebar-close i,#btn-nav i,.nav-list-expander i,#contact .contact-list i,.toc-header i,.top-arrow i,#btn-clear i{font-size:1em;line-height:1;}
 #btn-nav i{font-size:1.15rem}.sidebar-close i{font-size:1rem}.nav-list-expander i{transition:transform var(--motion-normal) ease}.nav-tree-node.is-expanded>.nav-item .nav-list-expander i{transform:rotate(180deg)}
+
+/* Back-to-top positioning fix */
+#backToTop, #back-to-top, .back-to-top, .backToTop {
+  position: fixed;
+  right: max(20px, env(safe-area-inset-right));
+  bottom: max(20px, env(safe-area-inset-bottom));
+  z-index: 9999;
+}
+@media (max-width: 767px) {
+  #backToTop, #back-to-top, .back-to-top, .backToTop {
+    right: max(16px, env(safe-area-inset-right));
+    bottom: max(16px, env(safe-area-inset-bottom));
+  }
+}
+@media (min-width: 768px) {
+  #backToTop, #back-to-top, .back-to-top, .backToTop {
+    right: max(24px, env(safe-area-inset-right));
+    bottom: max(24px, env(safe-area-inset-bottom));
+  }
+}
