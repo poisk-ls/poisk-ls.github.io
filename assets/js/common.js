@@ -15,6 +15,10 @@
     const dark = theme === 'dark';
     document.body.classList.toggle('dark-theme', dark);
     document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+    document.documentElement.classList.toggle('theme-light', !dark);
+    document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+    const themeMeta = $('meta[name="theme-color"]');
+    if (themeMeta) themeMeta.setAttribute('content', dark ? '#05070a' : '#f7f5f2');
     $$('.btn-brightness').forEach(button => {
       const label = dark ? 'Dark mode (tap to switch to light)' : 'Light mode (tap to switch to dark)';
       button.setAttribute('aria-label', label);
@@ -23,7 +27,7 @@
     });
     $$('.ico-dark, .ico-light').forEach(icon => icon.classList.toggle('active', dark));
     const main = $('main');
-    if (main) $$('.pre-dark', main).forEach(block => block.classList.toggle('pre-dark', dark));
+    if (main) $$('pre', main).forEach(block => block.classList.toggle('pre-dark', dark));
     changeGiscusTheme(dark ? 'noborder_gray' : 'light');
   }
 
@@ -343,6 +347,9 @@
         applyTheme(next);
       });
     });
+    window.addEventListener('storage', event => {
+      if (event.key === 'theme') applyTheme(event.newValue === 'light' ? 'light' : 'dark');
+    });
   }
 
   function initSearchUI() {
@@ -397,7 +404,15 @@ function searchPost(pages) {
   const clear = document.getElementById('btn-clear');
   if (!input || !results) return;
 
-  const source = Array.isArray(pages) ? pages.filter(post => !(post.title === 'Home' && post.type === 'category')) : [];
+  const seenUrls = new Set();
+  const source = Array.isArray(pages) ? pages.filter(post => {
+    if (!post || !post.title || !post.url) return false;
+    if (post.title === 'Home' && post.type === 'category') return false;
+    const key = String(post.url).replace(/\/index\.html$/i, '/').replace(/\.html$/i, '').replace(/\/+$/, '').toLowerCase() || '/';
+    if (seenUrls.has(key)) return false;
+    seenUrls.add(key);
+    return true;
+  }) : [];
   const normalized = source.map(post => ({
     ...post,
     _title: String(post.title || '').toLowerCase(),

@@ -16,7 +16,7 @@ window.PostModules.giscus = function () {
     'data-reactions-enabled': '1',
     'data-emit-metadata': '0',
     'data-input-position': 'top',
-    'data-theme': 'preferred_color_scheme',
+    'data-theme': document.documentElement.dataset.theme === 'light' ? 'light' : 'noborder_gray',
     'data-lang': 'en',
     'data-loading': 'lazy',
     crossorigin: 'anonymous',

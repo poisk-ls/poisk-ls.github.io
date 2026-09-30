@@ -2,12 +2,11 @@ document.addEventListener('DOMContentLoaded', function () {
   const innerContent = document.querySelector('main');
   if (!innerContent) return;
   const modules = window.PostModules || {};
-  const currentTheme = localStorage.getItem('theme');
+  const currentTheme = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
   modules.toc?.(innerContent);
   modules.content?.(innerContent);
   modules.scroll?.();
   modules.highlight?.(innerContent, currentTheme);
-  modules.analytics?.();
   modules.giscus?.();
   modules.clipboard?.();
 });

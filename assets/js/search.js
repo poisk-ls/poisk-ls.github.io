@@ -6,7 +6,7 @@
   function loadSearchIndex() {
     if (loaded) return Promise.resolve(window.__searchPages || []);
     if (loading) return loading;
-    loading = fetch(indexUrl, {credentials:'same-origin',cache:'force-cache'}).then(r => {
+    loading = fetch(indexUrl, {credentials:'same-origin',cache:'no-cache'}).then(r => {
       if (!r.ok) throw new Error(`Search index request failed: ${r.status}`);
       return r.json();
     }).then(pages => {

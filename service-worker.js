@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'site-v6-static';
+const CACHE_VERSION = 'site-v7-static';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const OFFLINE_URL = '/offline.html';
@@ -15,6 +15,7 @@ const SHELL = [
   '/assets/js/background.js',
   '/assets/css/highlight.min.css',
   '/assets/data/search-index.json',
+  '/assets/data/posts.json',
   '/assets/data/navigation.json',
   '/manifest.webmanifest'
 ];
@@ -39,6 +40,19 @@ self.addEventListener('fetch', event => {
       caches.open(RUNTIME_CACHE).then(cache => cache.put(request, copy));
       return response;
     }).catch(() => caches.match(request).then(cached => cached || caches.match(OFFLINE_URL))));
+    return;
+  }
+
+  // Content data (post list, search index, navigation) is network-first so a new or
+  // changed post is never hidden by a stale cached copy; the cache is only the offline fallback.
+  if (/\/assets\/data\/[^/]+\.json$/i.test(url.pathname)) {
+    event.respondWith(fetch(request).then(response => {
+      if (response.ok) {
+        const copy = response.clone();
+        caches.open(RUNTIME_CACHE).then(cache => cache.put(request, copy));
+      }
+      return response;
+    }).catch(() => caches.match(request)));
     return;
   }
 
