@@ -18,7 +18,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const nextButton = document.querySelector('#next-button');
     const prevButton = document.querySelector('#prev-button');
     const pageKey = 'pageKey=' + location.origin + location.pathname;
-    const paginationLimit = 5;
+    let paginationLimit = 5;
+    const SETTINGS_URL = '/assets/data/settings.json';
     const POSTS_URL = '/assets/data/posts.json';
     const INDEX_URL = '/assets/data/search-index.json';
     const FALLBACK_IMAGE = '/assets/img/thumbnail/empty.jpg';
@@ -27,8 +28,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // reconciliation so page counts always match what is in the DOM.
     const getItems = () => Array.from(paginatedList.querySelectorAll(':scope > li'));
     let listItems = getItems();
+    let pageCount = 1;
     const computePageCount = () => Math.max(1, Math.ceil(listItems.length / paginationLimit));
-    let pageCount = computePageCount();
+    pageCount = computePageCount();
     let currentPage = 1;
 
     const clampPage = value => {
@@ -186,14 +188,29 @@ document.addEventListener('DOMContentLoaded', function () {
         post.draft !== true && post.hidden !== true && post.published !== false
     );
 
+    // posts.json is the primary source; search-index.json is merged in so a page
+    // present in only one of the two is still listed. Each page appears once.
     const loadPosts = async () => {
-        let list;
+        const results = await Promise.allSettled([fetchJson(POSTS_URL), fetchJson(INDEX_URL)]);
+        const primary = results[0].status === 'fulfilled' && Array.isArray(results[0].value) ? results[0].value : [];
+        const secondary = results[1].status === 'fulfilled' && Array.isArray(results[1].value)
+            ? results[1].value.filter(entry => entry && entry.type === 'post') : [];
+        if (!primary.length && !secondary.length) throw new Error('No post data available');
+
+        const merged = new Map();
+        primary.concat(secondary).forEach(post => {
+            if (!isValidPost(post)) return;
+            const key = canonicalKey(post.url);
+            if (!merged.has(key)) merged.set(key, post);
+        });
+        return Array.from(merged.values());
+    };
+
+    const loadItemsPerPage = async () => {
         try {
-            list = await fetchJson(POSTS_URL);
-        } catch (_) {
-            list = (await fetchJson(INDEX_URL)).filter(entry => entry && entry.type === 'post');
-        }
-        return Array.isArray(list) ? list.filter(isValidPost) : [];
+            const value = Number((await fetchJson(SETTINGS_URL))?.pagination?.itemsPerPage);
+            return Number.isInteger(value) && value > 0 ? value : null;
+        } catch (_) { return null; }
     };
 
     // Which posts belong in this list: everything on Home, or the posts inside
@@ -276,7 +293,16 @@ document.addEventListener('DOMContentLoaded', function () {
         posts.filter(inScope).forEach(post => {
             const key = canonicalKey(post.url);
             dates.set(key, String(post.date || ''));
-            if (present.has(key)) return;
+            if (present.has(key)) {
+                // Pre-rendered excerpts that show literal entities ("&amp;", "&gt;")
+                // are replaced by the decoded text from the data source.
+                const excerpt = present.get(key).querySelector('.txt_post');
+                if (excerpt && /&(?:[a-z]+|#\d+|#x[0-9a-f]+);/i.test(excerpt.textContent)) {
+                    excerpt.textContent = decodeEntities(post.excerpt || post.description || '');
+                    changed = true;
+                }
+                return;
+            }
             const li = buildItem(post);
             paginatedList.appendChild(li);
             present.set(key, li);
@@ -304,7 +330,17 @@ document.addEventListener('DOMContentLoaded', function () {
     // Paginate right away from the pre-rendered list (no flash of the whole
     // list), then reconcile with the data source in the background.
     initialize();
-    reconcile().then(changed => { if (changed) rebuild(); }).catch(error => {
+    Promise.all([
+        loadItemsPerPage(),
+        reconcile().catch(error => {
+            console.warn('[posts] Could not reconcile the list with posts.json', error);
+            return false;
+        })
+    ]).then(([perPage, changed]) => {
+        const limitChanged = perPage !== null && perPage !== paginationLimit;
+        if (limitChanged) paginationLimit = perPage;
+        if (changed || limitChanged) rebuild();
+    }).catch(error => {
         console.warn('[posts] Could not reconcile the list with posts.json', error);
     });
 });

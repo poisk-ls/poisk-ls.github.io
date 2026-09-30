@@ -3778,3 +3778,67 @@ html body .swal2-validation-message,
 html body .swal2-footer {
   font-family:var(--font-jura);
 }
+
+/* ==========================================================================
+   Sidebar tree connectors
+   Each child gets an elbow into its own row; every sibling except the last
+   continues the trunk, so the line ends exactly at the final item. Replaces
+   the single continuous rail that ran past the last child.
+   ========================================================================== */
+.nav-tree {
+  --tree-indent:16px;
+  --tree-gap:0px;
+  --tree-line:var(--color-border-strong, var(--color-border));
+}
+/* Tablet / mobile rows are separated by a small gap; the trunk bridges it. */
+@media (max-width:1024px) {
+  .nav-tree { --tree-gap:var(--space-1, 4px); }
+}
+body .nav-tree-children::before { content:none; display:none; }
+body .nav-tree-children {
+  margin-left:var(--tree-indent);
+  padding-left:var(--tree-indent);
+}
+/* Elbow: drawn on the row itself, so it always meets the row's vertical middle
+   whatever the row height is (desktop, tablet or touch-sized mobile rows). */
+.nav-tree-children > .nav-tree-node > .nav-item::before {
+  content:"";
+  position:absolute;
+  top:0;
+  bottom:50%;
+  left:calc(var(--tree-indent) * -1);
+  width:calc(var(--tree-indent) - 3px);
+  border-left:1px solid var(--tree-line);
+  border-bottom:1px solid var(--tree-line);
+  pointer-events:none;
+}
+.nav-tree-children > .nav-tree-node:last-child > .nav-item::before {
+  border-bottom-left-radius:8px;
+}
+/* Trunk: runs the full height of every sibling except the last, so the line
+   ends exactly at the final item instead of trailing past it. */
+.nav-tree-children > .nav-tree-node:not(:last-child)::after {
+  content:"";
+  position:absolute;
+  top:0;
+  bottom:calc(var(--tree-gap) * -1);
+  left:calc(var(--tree-indent) * -1);
+  border-left:1px solid var(--tree-line);
+  pointer-events:none;
+}
+
+/* ==========================================================================
+   Desktop only (>=1025px): smaller, better balanced images.
+   Aspect ratios are untouched (width follows height via aspect-ratio and the
+   thumbnails keep object-fit:cover), so nothing is stretched. Tablet and
+   mobile keep their existing sizing.
+   ========================================================================== */
+@media (min-width:1025px) {
+  .paginated-item { height:13rem; }
+  .article_content .thumbnail_post { height:13rem; }
+  .article_content .box_contents { margin-left:-5rem; }
+  .post-header .thumbnail { width:min(100%, 44rem); }
+}
+
+/* Breadcrumb: long labels wrap instead of overflowing on narrow screens. */
+.category-tree p { overflow-wrap:anywhere; }
