@@ -3845,33 +3845,27 @@ body .nav-tree-children {
 
 /* ==========================================================================
    Header image: the same profile image as the sidebar avatar (one file, no
-   new asset), placed inside the site-name link right before the wordmark.
-   Square box + object-fit:cover keeps the ratio undistorted, same as the
-   sidebar avatar. One click target, aligned to the text at every size.
+   new asset), inside the site-name link right before the wordmark.
+   Hidden by default and shown only at tablet/mobile widths (<=1024px), where
+   the sidebar avatar is hidden. On desktop the sidebar avatar is the only
+   image, so the two can never appear together, whatever else loads or fails.
+   Square box + object-fit:cover keeps the ratio undistorted.
    ========================================================================== */
-.site-name { gap:.65rem; }
-.site-logo {
-  display:block;
-  flex:0 0 auto;
-  width:36px;
-  height:36px;
-  aspect-ratio:1 / 1;
-  object-fit:cover;
-  border-radius:50%;
-  box-shadow:0 0 0 2px var(--color-border);
-}
+.site-logo { display:none !important; }
 @media (max-width:1024px) {
-  .site-logo { width:34px; height:34px; }
+  .site-name { gap:.65rem; }
+  .site-logo {
+    display:block !important;
+    flex:0 0 auto;
+    width:34px;
+    height:34px;
+    aspect-ratio:1 / 1;
+    object-fit:cover;
+    border-radius:50%;
+    box-shadow:0 0 0 2px var(--color-border);
+  }
 }
 @media (max-width:420px) {
   .site-logo { width:30px; height:30px; }
   .site-name { gap:.55rem; }
-}
-
-/* Desktop: the sidebar already shows this same image as its round avatar above
-   the name, so the inline header copy is tablet/mobile only (where the avatar
-   is hidden). This keeps exactly one image visible at every size. */
-@media (min-width:1025px) {
-  .site-logo { display:none; }
-  .site-name { gap:0; }
 }
