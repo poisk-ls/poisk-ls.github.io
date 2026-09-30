@@ -727,32 +727,35 @@ body.sidebar-drawer-open .sidebar-drawer {
   min-width:0;
 }
 
+/* Submenus open and close on .is-expanded only (the toggle button is the single
+   source of truth). Collapsed = zero height, hidden and out of the tab order.
+   common.js animates the height between 0 and the content height. */
 .nav-tree-node > .nav-tree-children {
-  display:grid;
-  grid-template-rows:0fr;
+  display:flex;
+  flex-direction:column;
+  height:0;
   opacity:0;
   visibility:hidden;
   overflow:hidden;
-  transition:grid-template-rows var(--motion-normal) ease,
+  transition:height var(--motion-normal) ease,
                 opacity var(--motion-fast) ease,
                 visibility 0s linear var(--motion-normal);
 }
 
 .nav-tree-node > .nav-tree-children > * {
+  flex:0 0 auto;
   min-height:0;
 }
 
-.nav-tree-node.is-expanded > .nav-tree-children,
-.nav-tree-node.is-active > .nav-tree-children {
-  grid-template-rows:1fr;
+.nav-tree-node.is-expanded > .nav-tree-children {
+  height:auto;
   opacity:1;
   visibility:visible;
-  transition:grid-template-rows var(--motion-normal) ease,
+  transition:height var(--motion-normal) ease,
                   opacity var(--motion-fast) ease;
 }
 
-.nav-tree-node.is-expanded > .nav-item .nav-list-expander svg,
-.nav-tree-node.is-active > .nav-item .nav-list-expander svg {
+.nav-tree-node.is-expanded > .nav-item .nav-list-expander svg {
   transform:rotate(180deg);
 }
 
@@ -955,7 +958,7 @@ body.sidebar-drawer-open .sidebar-drawer {
 
 .category-tree p {
   margin:0;
-  padding:1rem 0 1rem 1.5rem;
+  padding:1rem 0;
   line-height:150%;
   font-weight:bold;
   color:slategrey;
@@ -964,13 +967,6 @@ body.sidebar-drawer-open .sidebar-drawer {
 .category-tree a {
   color:dodgerblue;
   text-decoration:none;
-}
-
-.category-tree svg {
-  position:absolute;
-  display:inline-flex;
-  top:18px;
-  width:14px;
 }
 
 .category-header {
@@ -1122,11 +1118,7 @@ body.sidebar-drawer-open .sidebar-drawer {
     font-size:1.125rem;
   }
   .category-tree p {
-    padding:1.5rem 0 1.5rem 2rem;
-  }
-  .category-tree svg {
-    top:28px;
-    width:18px;
+    padding:1.5rem 0;
   }
   .category-header {
     font-size:2.25rem;
@@ -1600,7 +1592,7 @@ main code {
   border:1px solid #eaeaea;
   background-color:#f4f4f4;
   border-radius:3px;
-  font-family:'Courier New', Courier, monospace;
+  font-family:'Jura', sans-serif;
   color:#B04008;
   position:relative;
   top:-1px;
@@ -1831,7 +1823,7 @@ main img + em {
   width:100%;
   margin:8px 0;
   line-height:1.25;
-  font-family:Verdana, Tahoma, sans-serif;
+  font-family:'Jura', sans-serif;
 }
 
 #related-posts img {
@@ -3267,17 +3259,6 @@ body {
    Sidebar refinements
    ========================================================================== */
 
-/* Nav: collapsed submenus must not reserve space. The tree grid only defined
-   one row track (0fr), so 2nd+ children of a collapsed parent (e.g. the three
-   pages under About) created auto rows that stayed in the layout and pushed
-   "Terminal" down. Collapse every implicit row too. */
-.nav-tree-node > .nav-tree-children {
-  grid-auto-rows:0;
-}
-.nav-tree-node.is-expanded > .nav-tree-children,
-.nav-tree-node.is-active > .nav-tree-children {
-  grid-auto-rows:auto;
-}
 .nav-tree-node > .nav-item {
   align-items:center;
 }
@@ -3473,7 +3454,6 @@ body .sidebar-drawer #navigation { box-sizing:border-box; }
 .nav-tree-children {
   margin-left:20px;
   padding-left:8px;
-  grid-template-columns:minmax(0, 1fr);
 }
 .nav-tree-children::before {
   left:0;
@@ -3713,8 +3693,7 @@ body .nav-list-expander:focus-visible {
      and the same 4px rhythm between rows. Collapsed submenus keep zero gap,
      so they still take no space. */
   .nav-tree-children { margin-left:12px; padding-left:8px; }
-  .nav-tree-node.is-expanded > .nav-tree-children,
-  .nav-tree-node.is-active > .nav-tree-children { row-gap:var(--space-1); margin-top:var(--space-1); }
+  .nav-tree-node.is-expanded > .nav-tree-children { row-gap:var(--space-1); margin-top:var(--space-1); }
 
   /* States stay inside their own row: no hover on touch screens (it sticks
      after a tap), a light pressed state instead, and focus rings drawn inside
@@ -3729,4 +3708,32 @@ body .nav-list-expander:focus-visible {
 
 @media (prefers-reduced-motion: reduce) {
   .site-action, .nav-list-link, .nav-list-expander { transition:none; }
+}
+
+/* ==========================================================================
+   Navigation rows + hamburger glyph
+   ========================================================================== */
+
+/* Root and every item after it share one row geometry: the link always spans the
+   full row (same highlight pill and label position on every row) and the
+   expander chevron sits inside the pill's right edge instead of shrinking it. */
+.nav-item { position:relative; }
+.nav-list-link { width:100%; padding-right:52px; }
+.nav-list-expander {
+  position:absolute;
+  top:50%;
+  right:4px;
+  margin:0;
+  transform:translateY(-50%);
+  z-index:1;
+}
+
+/* Hamburger: plain text glyph, swapped between "\2630" and "\00D7" by common.js. */
+#btn-nav .btn-nav-icon {
+  display:block;
+  font-size:1.6rem;
+  line-height:1;
+  pointer-events:none;
+  -webkit-user-select:none;
+  user-select:none;
 }
