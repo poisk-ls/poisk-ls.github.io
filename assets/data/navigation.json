@@ -1,8 +1,7 @@
 [
   {
-    "label": "Home",
+    "label": "Root",
     "url": "/",
-    "icon": "home",
     "order": 1
   },
   {
