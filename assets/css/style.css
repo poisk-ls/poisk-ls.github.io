@@ -808,8 +808,10 @@ body.sidebar-drawer-open .sidebar-drawer {
               box-shadow var(--motion-fast) ease;
 }
 
-.nav-list-link:hover {
-  background:var(--color-surface-hover);
+@media (hover:hover) and (pointer:fine) {
+  .nav-list-link:hover {
+    background:var(--color-surface-hover);
+  }
 }
 
 .nav-list-link:focus-visible {
@@ -869,10 +871,15 @@ body.sidebar-drawer-open .sidebar-drawer {
   transition:transform var(--motion-normal) ease;
 }
 
-.nav-list-expander:hover,
 .nav-list-expander:focus-visible {
   background:var(--color-surface-hover);
   color:var(--color-text);
+}
+@media (hover:hover) and (pointer:fine) {
+  .nav-list-expander:hover {
+    background:var(--color-surface-hover);
+    color:var(--color-text);
+  }
 }
 
 .nav-list-expander:focus-visible {
@@ -2690,12 +2697,13 @@ body.dark-theme .sidebar-action-icon {
 /* High-contrast dark theme. Colors intentionally avoid low-contrast gray-on-gray UI. */
 body.dark-theme .nav-lh .nav-tree-icon,
 /* High-contrast dark theme. Colors intentionally avoid low-contrast gray-on-gray UI. */
-body.dark-theme .nav-list-expander:hover,
-/* High-contrast dark theme. Colors intentionally avoid low-contrast gray-on-gray UI. */
 body.dark-theme .sidebar-action:hover,
 /* High-contrast dark theme. Colors intentionally avoid low-contrast gray-on-gray UI. */
 body.dark-theme .sidebar-close:hover {
   color: var(--color-accent);
+}
+@media (hover:hover) and (pointer:fine) {
+  body.dark-theme .nav-list-expander:hover { color: var(--color-accent); }
 }
 
 /* High-contrast dark theme. Colors intentionally avoid low-contrast gray-on-gray UI. */
@@ -3384,39 +3392,45 @@ html[data-theme="dark"] {
    ========================================================================== */
 
 /* ---- Header actions: icon-only Search + Theme ---- */
+/* One toolbar, two layouts (same markup, no duplicated controls):
+   - desktop (>=1025px): a top bar over the content column
+   - tablet / mobile (<=1024px): floating buttons at the bottom-left corner
+   Neither layout lives inside the sidebar. Layout rules sit in the
+   breakpoint blocks further down. */
+:root {
+  --topbar-height: 56px;
+  --sidebar-width: 18rem;      /* mirrors .sidebar-left on desktop */
+  --action-size: 48px;         /* floating touch target (matches back-to-top) */
+}
+@media (min-width:1441px) {
+  :root { --sidebar-width: calc((100vw - 54rem) / 2); }
+}
 .site-actions {
   position:fixed;
-  top:14px;
-  right:max(16px, env(safe-area-inset-right, 0px));
-  z-index:30;
   display:flex;
   align-items:center;
-  gap:4px;
-  padding:4px;
-  border:1px solid var(--color-border);
-  border-radius:14px;
-  background:var(--color-surface);
-  background:color-mix(in srgb, var(--color-surface) 80%, transparent);
-  -webkit-backdrop-filter:blur(10px);
-  backdrop-filter:blur(10px);
-  box-shadow:var(--shadow-sm);
+  box-sizing:border-box;
 }
 .site-action {
-  width:40px;
-  height:40px;
   display:inline-grid;
   place-items:center;
   padding:0;
   border:0;
-  border-radius:10px;
   background:transparent;
   color:var(--color-text);
   font:inherit;
   cursor:pointer;
   touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
   transition:background-color var(--motion-fast) ease, color var(--motion-fast) ease;
 }
-.site-action:hover {
+@media (hover:hover) and (pointer:fine) {
+  .site-action:hover {
+    background:var(--color-surface-hover);
+    color:var(--color-accent);
+  }
+}
+.site-action:active {
   background:var(--color-surface-hover);
   color:var(--color-accent);
 }
@@ -3479,8 +3493,10 @@ body.dark-theme .nav-tree-children { background:transparent; }
   font-size:.95rem;
   overflow:hidden;
 }
-.nav-list-link:hover { background:var(--color-surface-hover); }
 .nav-list-link:focus-visible { outline-offset:-2px; }
+@media (hover:hover) and (pointer:fine) {
+  .nav-list-link:hover { background:var(--color-surface-hover); }
+}
 
 .nav-tree-icon { flex:0 0 20px; width:20px; height:20px; }
 .nav-tree-icon i { font-size:.95rem; line-height:1; }
@@ -3507,9 +3523,11 @@ body .nav-tree-level-3 > .nav-item .nav-tree-icon { color:var(--color-text-muted
 .nav-tree-level-2 > .nav-item > .nav-list-link,
 .nav-tree-level-3 > .nav-item > .nav-list-link { min-height:40px; }
 
-/* Hover keeps text readable */
-body .nav-list-link:hover .nav-tree-label,
-body .nav-list-link:hover .nav-tree-icon { color:var(--color-text-strong); }
+/* Hover keeps text readable (mouse only) */
+@media (hover:hover) and (pointer:fine) {
+  body .nav-list-link:hover .nav-tree-label,
+  body .nav-list-link:hover .nav-tree-icon { color:var(--color-text-strong); }
+}
 
 /* Active states: current page = tinted pill + accent bar; parents = accent icon. */
 body .nav-tree-node.is-current > .nav-item > .nav-list-link {
@@ -3545,10 +3563,15 @@ body .nav-tree-node.is-active > .nav-item .nav-tree-label { font-weight:600; }
 }
 .nav-list-expander i { font-size:.75rem; }
 body .nav-list-expander { color:var(--color-text-muted); }
-body .nav-list-expander:hover,
 body .nav-list-expander:focus-visible {
   background:var(--color-surface-hover);
   color:var(--color-accent);
+}
+@media (hover:hover) and (pointer:fine) {
+  body .nav-list-expander:hover {
+    background:var(--color-surface-hover);
+    color:var(--color-accent);
+  }
 }
 
 /* ---- Sidebar: contact footer ---- */
@@ -3598,7 +3621,32 @@ body .nav-list-expander:focus-visible {
   .nav-tree-level-1 > .nav-item { margin-top:0; }
 
   #contact { margin:0 16px; padding:12px 0 14px; }
-  .site-actions { top:14px; }
+
+  /* Top bar: sits over the content column (same left edge and width as the
+     page card), so the controls line up with the content at every desktop
+     width and never touch the sidebar or the table of contents. */
+  .site-actions {
+    top:0;
+    left:var(--sidebar-width);
+    width:var(--pagewidth-desktop);
+    height:var(--topbar-height);
+    justify-content:flex-end;
+    gap:var(--space-2);
+    padding:0 var(--space-4);
+    z-index:30;
+    border-bottom:1px solid var(--color-border);
+    background:var(--color-surface);
+    background:color-mix(in srgb, var(--color-surface) 82%, transparent);
+    -webkit-backdrop-filter:blur(10px);
+    backdrop-filter:blur(10px);
+  }
+  .site-action {
+    width:40px;
+    height:40px;
+    border-radius:var(--radius-sm);
+  }
+  /* Page card starts below the bar. */
+  #post { margin-top:calc(var(--topbar-height) + var(--space-5)); }
 }
 @media (min-width:1025px) and (max-height:700px) {
   body .side-banner { padding:14px 16px 12px; gap:8px; }
@@ -3610,7 +3658,7 @@ body .nav-list-expander:focus-visible {
   .side-banner {
     height:var(--mobile-header-height);
     min-height:0;
-    padding:0 112px 0 max(10px, env(safe-area-inset-left, 0px));
+    padding:0 max(10px, env(safe-area-inset-right, 0px)) 0 max(10px, env(safe-area-inset-left, 0px));
     gap:10px;
     justify-content:flex-start;
   }
@@ -3618,26 +3666,32 @@ body .nav-list-expander:focus-visible {
   .sidebar-brand { flex:1 1 auto; min-width:0; }
   .site-name mark { font-size:1.05rem; overflow-wrap:normal; white-space:nowrap; }
 
+  /* Floating controls: bottom-left, mirroring the back-to-top button on the
+     right. Offsets include the device safe areas (notch / home indicator).
+     z-index sits below the search overlay, the drawer backdrop and the image
+     viewer, so they never cover navigation or dialogs. */
   .site-actions {
-    top:0;
-    right:max(10px, env(safe-area-inset-right, 0px));
-    z-index:calc(var(--stack-sidebar-header) + 1);
-    height:var(--mobile-header-height);
-    gap:8px;
-    padding:0;
-    border:0;
-    border-radius:0;
-    background:transparent;
-    -webkit-backdrop-filter:none;
-    backdrop-filter:none;
-    box-shadow:none;
+    left:max(var(--mobile-edge-space), env(safe-area-inset-left, 0px));
+    bottom:var(--mobile-floating-bottom);
+    z-index:900;
+    gap:var(--space-2);
+    pointer-events:none;   /* only the buttons take taps, not the gap */
   }
   .site-action {
-    width:44px;
-    height:44px;
+    width:var(--action-size);
+    height:var(--action-size);
     border:1px solid var(--color-border);
-    border-radius:var(--radius-sm);
-    background:var(--color-surface);
+    border-radius:50%;
+    background:var(--color-surface-raised);
+    pointer-events:auto;
+  }
+  /* Hidden while the drawer is open so nothing sits on top of the menu. */
+  body.sidebar-drawer-open .site-actions { visibility:hidden; }
+
+  /* Reserve scroll room so the last lines / pagination can clear the floating
+     buttons instead of being covered by them. */
+  #post {
+    padding-bottom:calc(var(--action-size) + var(--mobile-floating-bottom) + var(--space-3));
   }
 
   .sidebar-drawer {
@@ -3645,11 +3699,31 @@ body .nav-list-expander:focus-visible {
     padding-bottom:env(safe-area-inset-bottom, 0px);
   }
   .sidebar-drawer #navigation { padding:12px 10px 8px; }
+
+  /* Touch-friendly rows with a real gap between them, so a highlighted row
+     can never touch or cover its neighbours. Same row heights at every level. */
+  .nav-tree { gap:var(--space-1); }
   .nav-item { min-height:48px; }
-  .nav-list-link { min-height:48px; }
+  .nav-list-link { min-height:48px; padding-block:6px; }
   .nav-tree-level-2 > .nav-item > .nav-list-link,
-  .nav-tree-level-3 > .nav-item > .nav-list-link { min-height:44px; }
+  .nav-tree-level-3 > .nav-item > .nav-list-link { min-height:48px; }
   .nav-list-expander { flex-basis:44px; width:44px; min-width:44px; height:44px; }
+
+  /* Submenus: compact indent (long labels stay readable on 320px screens)
+     and the same 4px rhythm between rows. Collapsed submenus keep zero gap,
+     so they still take no space. */
+  .nav-tree-children { margin-left:12px; padding-left:8px; }
+  .nav-tree-node.is-expanded > .nav-tree-children,
+  .nav-tree-node.is-active > .nav-tree-children { row-gap:var(--space-1); margin-top:var(--space-1); }
+
+  /* States stay inside their own row: no hover on touch screens (it sticks
+     after a tap), a light pressed state instead, and focus rings drawn inside
+     the element so they cannot spill onto neighbours. */
+  .nav-list-link, .nav-list-expander { -webkit-tap-highlight-color:transparent; }
+  .nav-list-link:focus-visible,
+  .nav-list-expander:focus-visible { outline-offset:-2px; }
+  .nav-list-link:active,
+  .nav-list-expander:active { background:var(--color-surface-hover); }
   #contact { margin:0 12px; padding:10px 0 12px; }
 }
 
