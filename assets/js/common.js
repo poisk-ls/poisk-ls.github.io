@@ -36,6 +36,7 @@
   function initNavigation() {
     const nav = $('#navigation');
     const menu = $('#btn-nav');
+    const menuIcon = $('.btn-nav-icon', menu || document);
     const drawer = $('#sidebar-drawer');
     const closeButton = $('#btn-sidebar-close');
     const backdrop = $('[data-sidebar-close]');
@@ -76,14 +77,51 @@
       storage.set(expandedStorageKey, JSON.stringify(keys));
     };
 
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    // Animates a submenu between 0 and its content height. The inline height is
+    // removed afterwards, so the CSS (auto when open, 0 when closed) takes over
+    // again and nested submenus can grow and shrink freely.
+    const animateChildren = (list, from, expanded) => {
+      window.clearTimeout(list._navTimer);
+      if (list._navEnd) list.removeEventListener('transitionend', list._navEnd);
+
+      const finish = () => {
+        window.clearTimeout(list._navTimer);
+        list.removeEventListener('transitionend', list._navEnd);
+        list.style.height = '';
+      };
+      list._navEnd = event => {
+        if (event.target === list && event.propertyName === 'height') finish();
+      };
+
+      const to = expanded ? list.scrollHeight : 0;
+      list.style.height = `${from}px`;
+      void list.offsetHeight; // commit the start height before changing it
+      list.style.height = `${to}px`;
+      list.addEventListener('transitionend', list._navEnd);
+      list._navTimer = window.setTimeout(finish, 400);
+    };
+
     const setExpanded = (node, expanded, persist = true) => {
-      if (!node || !$('.nav-tree-children', node)) return;
+      const list = node && node.querySelector(':scope > .nav-tree-children');
+      if (!list) return;
       const button = $('.nav-list-expander', node);
       const label = $('.nav-tree-label', node)?.textContent?.trim() || 'section';
+      const changed = node.classList.contains('is-expanded') !== expanded;
+      const from = list.getBoundingClientRect().height;
+
       node.classList.toggle('is-expanded', expanded);
       if (button) {
         button.setAttribute('aria-expanded', String(expanded));
         button.setAttribute('aria-label', `${expanded ? 'Collapse' : 'Expand'} ${label}`);
+      }
+
+      if (persist && changed && !reduceMotion.matches) {
+        animateChildren(list, from, expanded);
+      } else {
+        window.clearTimeout(list._navTimer);
+        list.style.height = '';
       }
       if (persist) saveExpanded();
     };
@@ -160,6 +198,7 @@
       menu.classList.toggle('nav-open', open);
       menu.setAttribute('aria-expanded', String(open));
       menu.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+      if (menuIcon) menuIcon.textContent = open ? '\u00D7' : '\u2630';
       drawer.setAttribute('aria-hidden', String(!open && mobile));
       drawer.inert = !open && mobile;
 
@@ -183,6 +222,7 @@
         menu.classList.remove('nav-open');
         menu.setAttribute('aria-expanded', 'false');
         menu.setAttribute('aria-label', 'Open navigation menu');
+        if (menuIcon) menuIcon.textContent = '\u2630';
         drawer.removeAttribute('aria-hidden');
         drawer.inert = false;
         if (backdrop) backdrop.setAttribute('aria-hidden', 'true');
