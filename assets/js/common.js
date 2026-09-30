@@ -15,6 +15,12 @@
     const dark = theme === 'dark';
     document.body.classList.toggle('dark-theme', dark);
     document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+    $$('.btn-brightness').forEach(button => {
+      const label = dark ? 'Dark mode (tap to switch to light)' : 'Light mode (tap to switch to dark)';
+      button.setAttribute('aria-label', label);
+      button.setAttribute('title', dark ? 'Dark mode' : 'Light mode');
+      button.setAttribute('aria-pressed', String(dark));
+    });
     $$('.ico-dark, .ico-light').forEach(icon => icon.classList.toggle('active', dark));
     const main = $('main');
     if (main) $$('.pre-dark', main).forEach(block => block.classList.toggle('pre-dark', dark));
@@ -282,46 +288,6 @@
       setHeaderHeight();
       window.addEventListener('resize', setHeaderHeight, { passive: true });
       if ('ResizeObserver' in window) new ResizeObserver(setHeaderHeight).observe(header);
-    }
-
-    const applyTawkPosition = () => {
-      const mobile = window.matchMedia('(max-width: 1024px)').matches;
-      const root = document.documentElement;
-      const container = document.getElementById('tawkchat-container');
-      const frame = container?.querySelector('iframe') || document.querySelector('iframe[title*="chat" i]');
-      const target = container || frame?.parentElement;
-
-      if (!mobile || !target) {
-        root.style.setProperty('--mobile-tawk-size', '0px');
-        return;
-      }
-
-      target.setAttribute('data-mobile-floating-control', 'tawk');
-      const rect = target.getBoundingClientRect();
-      const measuredSize = Math.max(48, Math.min(80, Math.ceil(Math.max(rect.height || 0, frame?.getBoundingClientRect().height || 0))));
-      const fallbackSize = measuredSize || 60;
-      root.style.setProperty('--mobile-tawk-size', `${fallbackSize}px`);
-
-      // Tawk controls its own inline position. Override only the mobile bottom
-      // slot so the service remains untouched while the launcher gets a stable
-      // relationship to this site's floating controls.
-      const bottom = getComputedStyle(root).getPropertyValue('--mobile-floating-bottom').trim();
-      if (bottom && target.style.getPropertyValue('bottom') !== bottom) target.style.setProperty('bottom', bottom);
-    };
-
-    let tawkTimer = 0;
-    const scheduleTawkPosition = () => {
-      window.clearTimeout(tawkTimer);
-      tawkTimer = window.setTimeout(applyTawkPosition, 80);
-    };
-
-    scheduleTawkPosition();
-    window.addEventListener('resize', scheduleTawkPosition, { passive: true });
-    window.addEventListener('orientationchange', scheduleTawkPosition, { passive: true });
-
-    if ('MutationObserver' in window) {
-      const observer = new MutationObserver(() => scheduleTawkPosition());
-      observer.observe(document.body, { childList: true, subtree: true });
     }
   }
 
