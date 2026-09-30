@@ -167,7 +167,7 @@
 
       if (focus) {
         if (open) {
-          requestAnimationFrame(() => closeButton?.focus());
+          requestAnimationFrame(() => (closeButton || drawer).focus({ preventScroll: true }));
         } else {
           requestAnimationFrame(() => lastTrigger?.focus());
         }
