@@ -3867,3 +3867,11 @@ body .nav-tree-children {
   .site-logo { width:30px; height:30px; }
   .site-name { gap:.55rem; }
 }
+
+/* Desktop: the sidebar already shows this same image as its round avatar above
+   the name, so the inline header copy is tablet/mobile only (where the avatar
+   is hidden). This keeps exactly one image visible at every size. */
+@media (min-width:1025px) {
+  .site-logo { display:none; }
+  .site-name { gap:0; }
+}
