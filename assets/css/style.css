@@ -3376,3 +3376,283 @@ html[data-theme="dark"] {
     bottom:var(--mobile-floating-bottom);
   }
 }
+
+
+/* ==========================================================================
+   Sidebar redesign + header actions (Search / Theme live outside the sidebar)
+   All colours come from the theme tokens, so Light and Dark both adapt.
+   ========================================================================== */
+
+/* ---- Header actions: icon-only Search + Theme ---- */
+.site-actions {
+  position:fixed;
+  top:14px;
+  right:max(16px, env(safe-area-inset-right, 0px));
+  z-index:30;
+  display:flex;
+  align-items:center;
+  gap:4px;
+  padding:4px;
+  border:1px solid var(--color-border);
+  border-radius:14px;
+  background:var(--color-surface);
+  background:color-mix(in srgb, var(--color-surface) 80%, transparent);
+  -webkit-backdrop-filter:blur(10px);
+  backdrop-filter:blur(10px);
+  box-shadow:var(--shadow-sm);
+}
+.site-action {
+  width:40px;
+  height:40px;
+  display:inline-grid;
+  place-items:center;
+  padding:0;
+  border:0;
+  border-radius:10px;
+  background:transparent;
+  color:var(--color-text);
+  font:inherit;
+  cursor:pointer;
+  touch-action:manipulation;
+  transition:background-color var(--motion-fast) ease, color var(--motion-fast) ease;
+}
+.site-action:hover {
+  background:var(--color-surface-hover);
+  color:var(--color-accent);
+}
+.site-action:focus-visible {
+  outline:2px solid var(--color-focus);
+  outline-offset:2px;
+}
+.site-action-icon {
+  width:20px;
+  height:20px;
+  display:grid;
+  place-items:center;
+  pointer-events:none;
+}
+.site-action-icon i {
+  grid-area:1 / 1;
+  font-size:1.05rem;
+  line-height:1;
+}
+/* Theme button shows only the icon of the theme that is active. */
+html[data-theme="dark"] .site-action-icon .ico-dark,
+html[data-theme="light"] .site-action-icon .ico-light { display:block; }
+html[data-theme="dark"] .site-action-icon .ico-light,
+html[data-theme="light"] .site-action-icon .ico-dark { display:none; }
+
+/* ---- Sidebar: brand block ---- */
+.side-banner {
+  box-sizing:border-box;
+}
+.site-name mark { letter-spacing:.14em; }
+
+/* ---- Sidebar: navigation tree (all breakpoints) ---- */
+body .sidebar-drawer #navigation { box-sizing:border-box; }
+
+.nav-tree {
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.nav-tree-children {
+  margin-left:20px;
+  padding-left:8px;
+  grid-template-columns:minmax(0, 1fr);
+}
+.nav-tree-children::before {
+  left:0;
+  top:4px;
+  bottom:4px;
+}
+body .nav-tree-children,
+body.dark-theme .nav-tree-children { background:transparent; }
+
+.nav-item { min-height:44px; }
+.nav-list-link {
+  box-sizing:border-box;
+  min-height:44px;
+  gap:12px;
+  padding:0 12px;
+  border-radius:var(--radius-md, 12px);
+  font-size:.95rem;
+  overflow:hidden;
+}
+.nav-list-link:hover { background:var(--color-surface-hover); }
+.nav-list-link:focus-visible { outline-offset:-2px; }
+
+.nav-tree-icon { flex:0 0 20px; width:20px; height:20px; }
+.nav-tree-icon i { font-size:.95rem; line-height:1; }
+.nav-tree-label { line-height:1.3; }
+
+/* Hierarchy: level 1 = strong, deeper levels = quieter. */
+body .nav-tree-level-1 > .nav-item > .nav-list-link,
+body .nav-tree-level-1 > .nav-item .nav-tree-label {
+  color:var(--color-text-strong);
+  font-weight:600;
+}
+body .nav-tree-level-1 > .nav-item .nav-tree-icon { color:var(--color-accent); }
+
+body .nav-tree-level-2 > .nav-item > .nav-list-link,
+body .nav-tree-level-3 > .nav-item > .nav-list-link,
+body .nav-tree-level-2 > .nav-item .nav-tree-label,
+body .nav-tree-level-3 > .nav-item .nav-tree-label {
+  color:var(--color-text-muted);
+  font-size:.9rem;
+  font-weight:500;
+}
+body .nav-tree-level-2 > .nav-item .nav-tree-icon,
+body .nav-tree-level-3 > .nav-item .nav-tree-icon { color:var(--color-text-muted); opacity:.85; }
+.nav-tree-level-2 > .nav-item > .nav-list-link,
+.nav-tree-level-3 > .nav-item > .nav-list-link { min-height:40px; }
+
+/* Hover keeps text readable */
+body .nav-list-link:hover .nav-tree-label,
+body .nav-list-link:hover .nav-tree-icon { color:var(--color-text-strong); }
+
+/* Active states: current page = tinted pill + accent bar; parents = accent icon. */
+body .nav-tree-node.is-current > .nav-item > .nav-list-link {
+  background:var(--color-surface-hover);
+  background:color-mix(in srgb, var(--color-accent) 14%, transparent);
+  box-shadow:none;
+}
+body .nav-tree-node.is-current > .nav-item > .nav-list-link::before {
+  content:"";
+  position:absolute;
+  left:0;
+  top:10px;
+  bottom:10px;
+  width:3px;
+  border-radius:0 3px 3px 0;
+  background:var(--color-accent);
+}
+body .nav-tree-node.is-current > .nav-item .nav-tree-label,
+body .nav-tree-node.is-current > .nav-item .nav-tree-icon {
+  color:var(--color-accent);
+  font-weight:700;
+}
+body .nav-tree-node.is-active > .nav-item .nav-tree-label { font-weight:600; }
+
+/* Expander */
+.nav-list-expander {
+  flex:0 0 40px;
+  width:40px;
+  min-width:40px;
+  height:40px;
+  margin-left:2px;
+  border-radius:10px;
+}
+.nav-list-expander i { font-size:.75rem; }
+body .nav-list-expander { color:var(--color-text-muted); }
+body .nav-list-expander:hover,
+body .nav-list-expander:focus-visible {
+  background:var(--color-surface-hover);
+  color:var(--color-accent);
+}
+
+/* ---- Sidebar: contact footer ---- */
+#contact { border-top:0; }
+#contact hr { margin:0 0 10px; }
+#contact .contact-list { gap:2px; }
+#contact .contact-list li a { width:36px; min-width:36px; min-height:36px; border-radius:10px; }
+#contact > span { font-size:.72rem; }
+
+/* ---- Desktop ---- */
+@media (min-width:1025px) {
+  body .sidebar-left,
+  body.dark-theme .sidebar-left {
+    box-sizing:border-box;
+    background:var(--color-surface);
+    background:color-mix(in srgb, var(--color-surface) 78%, transparent);
+    -webkit-backdrop-filter:blur(10px);
+    backdrop-filter:blur(10px);
+    border-right:1px solid var(--color-border);
+  }
+  body .side-banner,
+  body.dark-theme .side-banner {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:12px;
+    padding:26px 16px 18px;
+    border:0;
+    box-shadow:none;
+    background:transparent;
+  }
+  .side-banner::after {
+    content:"";
+    position:absolute;
+    left:16px;
+    right:16px;
+    bottom:0;
+    height:1px;
+    background:var(--color-border);
+  }
+  .site-avatar { order:-1; display:block; margin:0; }
+  .site-avatar img { width:72px; height:72px; outline-width:2px; }
+  .sidebar-brand { align-items:center; }
+  .site-name mark { font-size:1.25rem; }
+
+  .sidebar-drawer #navigation { padding:16px 12px 12px; }
+  .nav-tree-level-1 > .nav-item { margin-top:0; }
+
+  #contact { margin:0 16px; padding:12px 0 14px; }
+  .site-actions { top:14px; }
+}
+@media (min-width:1025px) and (max-height:700px) {
+  body .side-banner { padding:14px 16px 12px; gap:8px; }
+  .site-avatar img { width:48px; height:48px; }
+}
+
+/* ---- Tablet / mobile: header bar + slide-in drawer ---- */
+@media (max-width:1024px) {
+  .side-banner {
+    height:var(--mobile-header-height);
+    min-height:0;
+    padding:0 112px 0 max(10px, env(safe-area-inset-left, 0px));
+    gap:10px;
+    justify-content:flex-start;
+  }
+  #btn-nav { order:-1; }
+  .sidebar-brand { flex:1 1 auto; min-width:0; }
+  .site-name mark { font-size:1.05rem; overflow-wrap:normal; white-space:nowrap; }
+
+  .site-actions {
+    top:0;
+    right:max(10px, env(safe-area-inset-right, 0px));
+    z-index:calc(var(--stack-sidebar-header) + 1);
+    height:var(--mobile-header-height);
+    gap:8px;
+    padding:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    -webkit-backdrop-filter:none;
+    backdrop-filter:none;
+    box-shadow:none;
+  }
+  .site-action {
+    width:44px;
+    height:44px;
+    border:1px solid var(--color-border);
+    border-radius:var(--radius-sm);
+    background:var(--color-surface);
+  }
+
+  .sidebar-drawer {
+    width:min(86vw, 320px);
+    padding-bottom:env(safe-area-inset-bottom, 0px);
+  }
+  .sidebar-drawer #navigation { padding:12px 10px 8px; }
+  .nav-item { min-height:48px; }
+  .nav-list-link { min-height:48px; }
+  .nav-tree-level-2 > .nav-item > .nav-list-link,
+  .nav-tree-level-3 > .nav-item > .nav-list-link { min-height:44px; }
+  .nav-list-expander { flex-basis:44px; width:44px; min-width:44px; height:44px; }
+  #contact { margin:0 12px; padding:10px 0 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-action, .nav-list-link, .nav-list-expander { transition:none; }
+}
