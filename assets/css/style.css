@@ -3844,22 +3844,26 @@ body .nav-tree-children {
 .category-tree p { overflow-wrap:anywhere; }
 
 /* ==========================================================================
-   Header logo: sits inside the site-name link, before the wordmark, so one
-   click target, one image, and it follows the text's alignment at every size.
+   Header image: the same profile image as the sidebar avatar (one file, no
+   new asset), placed inside the site-name link right before the wordmark.
+   Square box + object-fit:cover keeps the ratio undistorted, same as the
+   sidebar avatar. One click target, aligned to the text at every size.
    ========================================================================== */
-.site-name { gap:.6rem; }
+.site-name { gap:.65rem; }
 .site-logo {
   display:block;
   flex:0 0 auto;
-  width:32px;
-  height:32px;
-  object-fit:contain;
-  border-radius:8px;
+  width:36px;
+  height:36px;
+  aspect-ratio:1 / 1;
+  object-fit:cover;
+  border-radius:50%;
+  box-shadow:0 0 0 2px var(--color-border);
 }
 @media (max-width:1024px) {
-  .site-logo { width:30px; height:30px; }
+  .site-logo { width:34px; height:34px; }
 }
 @media (max-width:420px) {
-  .site-logo { width:28px; height:28px; }
-  .site-name { gap:.5rem; }
+  .site-logo { width:30px; height:30px; }
+  .site-name { gap:.55rem; }
 }
