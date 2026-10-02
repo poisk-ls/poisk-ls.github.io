@@ -4014,3 +4014,37 @@ body:not(.dark-theme) #search input:-webkit-autofill:focus {
     right:0;
   }
 }
+
+/* ==========================================================================
+   Desktop spacing refinement (1025px - 1440px only)
+   More breathing room on BOTH sides of the page card: between the sidebar and
+   the card, and between the card and the right edge of the viewport. The gap
+   scales with the viewport, the card stays centered in the space right of the
+   sidebar, and it re-centers on resize. Card design is unchanged; only its
+   fluid width gives way a little to make room. Additive override; nothing
+   above this block was edited. At >=1441px the card already sits with wide,
+   equal gutters, and tablet / mobile (<=1024px) are not touched.
+   ========================================================================== */
+@media (min-width:1025px) and (max-width:1440px) {
+  #post {
+    --post-edge:clamp(2.5rem, 6.5vw, 6rem);   /* gap on each side of the card */
+    --post-w:max(38rem, min(54rem, calc(100% - var(--sidebar-width) - (var(--post-edge) * 2))));
+    width:var(--post-w);
+    margin-left:max(
+      calc(var(--sidebar-width) + var(--post-edge) / 2),
+      calc(var(--sidebar-width) + (100% - var(--sidebar-width) - var(--post-w)) / 2)
+    );
+    margin-right:0;
+  }
+}
+
+/* Header: explicit full-bleed bar across the whole desktop viewport. */
+@media (min-width:1025px) {
+  .site-actions {
+    left:0;
+    right:0;
+    width:100%;
+    max-width:none;
+    box-sizing:border-box;
+  }
+}
