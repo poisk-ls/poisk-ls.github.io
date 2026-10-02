@@ -125,10 +125,6 @@ input::-webkit-search-results-decoration {
   }
 }
 
-:root {
-  --pagewidth-desktop:calc(max(min(100vw - 18rem - 2rem, 54rem), 44rem));
-}
-
 .sidebar {
   position:relative;
   z-index:20;
@@ -577,9 +573,9 @@ body.sidebar-drawer-open .sidebar-drawer {
 @media (min-width:1025px) {
   .sidebar-left {
     position:fixed;
-    inset:0 auto 0 0;
-    width:18rem;
-    min-height:100vh;
+    inset:var(--topbar-height) auto 0 0;
+    width:var(--sidebar-width);
+    min-height:0;
     align-items:stretch;
     background:transparent;
   }
@@ -672,19 +668,11 @@ body.sidebar-drawer-open .sidebar-drawer {
     top:0;
     right:0;
     height:100%;
-    margin-left:calc(var(--pagewidth-desktop) + 18rem/2);
     z-index:2;
   }
 }
 
 @media (min-width:1441px) {
-  .sidebar-left {
-    width:calc((100vw - 54rem)/2);
-  }
-  .sidebar-right {
-    width:calc((100vw - 54rem)/2);
-    margin-left:calc(54rem + (100vw - 54rem)/2);
-  }
   .sidebar-drawer #navigation {
     max-width:22rem;
     margin-inline:auto;
@@ -2011,30 +1999,12 @@ main table thead th {
 }
 
 @media (min-width:1025px) {
-  #post {
-    margin:4rem 0;
-    margin-left:18rem;
-    width:var(--pagewidth-desktop);
-    display:inline-block;
-  }
   .inner-header {
     display:block;
   }
   .inner-content {
     border-radius:0 0 1rem 1rem;
     box-shadow:0 16px 16px 8px rgba(31, 35, 46, 0.15);
-  }
-  .top-arrow {
-    left:calc(18rem + var(--pagewidth-desktop) - 4rem);
-  }
-}
-
-@media (min-width:1441px) {
-  #post {
-    margin-left:calc((100vw - 54rem)/2);
-  }
-  .top-arrow {
-    left:calc(50vw + 54rem/2 - 4rem);
   }
 }
 
@@ -3613,17 +3583,16 @@ body .nav-list-expander:focus-visible {
 
   #contact { margin:0 16px; padding:12px 0 14px; }
 
-  /* Top bar: sits over the content column (same left edge and width as the
-     page card), so the controls line up with the content at every desktop
-     width and never touch the sidebar or the table of contents. */
+  /* Top bar: full viewport width (left:0 / right:0). It sits above the sidebar
+     and the content area, which both start below it. */
   .site-actions {
     top:0;
-    left:var(--sidebar-width);
-    width:var(--pagewidth-desktop);
+    left:0;
+    right:0;
     height:var(--topbar-height);
     justify-content:flex-end;
     gap:var(--space-2);
-    padding:0 var(--space-4);
+    padding:0 var(--space-5);
     z-index:30;
     border-bottom:1px solid var(--color-border);
     background:var(--color-surface);
@@ -3636,8 +3605,6 @@ body .nav-list-expander:focus-visible {
     height:40px;
     border-radius:var(--radius-sm);
   }
-  /* Page card starts below the bar. */
-  #post { margin-top:calc(var(--topbar-height) + var(--space-5)); }
 }
 @media (min-width:1025px) and (max-height:700px) {
   body .side-banner { padding:14px 16px 12px; gap:8px; }
@@ -3947,104 +3914,55 @@ body:not(.dark-theme) #search input:-webkit-autofill:focus {
 }
 
 /* ==========================================================================
-   Desktop layout fix (>=1025px only)
-   - Header spans the full viewport width (above the sidebar and the content)
-   - Sidebar stays fixed on the left, same width, and now starts under the header
-   - Page card is centered in the content area and re-centers on resize
-   - Less empty space above / below the card
-   Additive override block: appended last so it wins the cascade; no earlier
-   rule is modified. Tablet / mobile (<=1024px) layouts are not affected.
+   Desktop layout system (>=1025px)
+
+   Three tracks under one full-width header:
+     [ sidebar ]  [ content area ]  [ Contents ]
+   - Header (.site-actions) is fixed with left:0 / right:0 (see the desktop block above).
+   - Sidebar (.sidebar-left) is fixed, --sidebar-width wide, below the header.
+   - <body> reserves the sidebar track (padding-left) and, on post pages >=1441px, the
+     Contents track (padding-right). What is left is the content area.
+   - #post is a normal block in that area, centred by margin:auto, so it re-centres on
+     every resize and cannot be skewed by a classic scrollbar (percentages resolve
+     against the body's content box, not the window).
+   - --content-gutter is the minimum breathing room on EACH side of the card; the
+     card's width gives way before the gutters do (down to --card-min).
    ========================================================================== */
 :root {
-  --post-reserve:0px;   /* room kept free on the right of the card (desktop only) */
-  --post-gap:2rem;      /* minimum breathing room around the card */
+  --card-max:54rem;
+  --card-min:38rem;
+  --content-gutter:clamp(2.5rem, 6.5vw, 6rem);
+  --toc-width:0px;                 /* width of the Contents track (post pages, >=1441px) */
 }
 
-@media (min-width:1025px) {
-  /* Header: remove the content-column width limit, run edge to edge. */
-  .site-actions {
-    left:0;
-    right:0;
-    width:auto;
-    max-width:none;
-    padding:0 var(--space-5);
-  }
-
-  /* Sidebar: same fixed left column and width, it just starts below the
-     full-width header (its navigation already scrolls when the window is short). */
-  body .sidebar-left,
-  body.dark-theme .sidebar-left {
-    top:var(--topbar-height);
-    min-height:0;
-  }
-
-  /* Page card: width and horizontal position are both derived from the room
-     to the right of the sidebar, so it stays centered at every desktop width.
-     "100%" is the body width, so a classic scrollbar cannot skew the centering. */
-  #post {
-    --post-w:max(44rem, min(54rem, calc(100% - var(--sidebar-width) - var(--post-reserve) - var(--post-gap))));
-    display:block;
-    box-sizing:border-box;
-    width:var(--post-w);
-    margin-top:calc(var(--topbar-height) + var(--space-4));
-    margin-bottom:var(--space-5);
-    margin-right:0;
-    margin-left:max(
-      var(--sidebar-width),
-      calc(var(--sidebar-width) + (100% - var(--sidebar-width) - var(--post-reserve) - var(--post-w)) / 2)
-    );
-  }
-}
-
-/* Wide desktop: the sidebar column is wide here, so the card is centered in the
-   space to its right. Post pages keep the "Contents" column (20rem) beside the
-   card; list pages (no Contents) use the whole space. */
 @media (min-width:1441px) {
-  body:not(:has(#category-list)) { --post-reserve:20rem; }
-  #post { --post-w:54rem; }
-  /* "Contents" column follows the card's right edge. (The original rule pinned
-     this box to the right edge, so it is positioned with left/right here.) */
-  .sidebar-right {
-    margin-left:0;
-    width:auto;
-    left:max(
-      calc(var(--sidebar-width) + 54rem),
-      calc(var(--sidebar-width) + (100vw - var(--sidebar-width) - var(--post-reserve) - 54rem) / 2 + 54rem)
-    );
-    right:0;
-  }
+  :root { --toc-width:20rem; }
+  body:has(#category-list) { --toc-width:0px; }   /* list pages have no Contents entries */
 }
 
-/* ==========================================================================
-   Desktop spacing refinement (1025px - 1440px only)
-   More breathing room on BOTH sides of the page card: between the sidebar and
-   the card, and between the card and the right edge of the viewport. The gap
-   scales with the viewport, the card stays centered in the space right of the
-   sidebar, and it re-centers on resize. Card design is unchanged; only its
-   fluid width gives way a little to make room. Additive override; nothing
-   above this block was edited. At >=1441px the card already sits with wide,
-   equal gutters, and tablet / mobile (<=1024px) are not touched.
-   ========================================================================== */
-@media (min-width:1025px) and (max-width:1440px) {
-  #post {
-    --post-edge:clamp(2.5rem, 6.5vw, 6rem);   /* gap on each side of the card */
-    --post-w:max(38rem, min(54rem, calc(100% - var(--sidebar-width) - (var(--post-edge) * 2))));
-    width:var(--post-w);
-    margin-left:max(
-      calc(var(--sidebar-width) + var(--post-edge) / 2),
-      calc(var(--sidebar-width) + (100% - var(--sidebar-width) - var(--post-w)) / 2)
-    );
-    margin-right:0;
-  }
-}
-
-/* Header: explicit full-bleed bar across the whole desktop viewport. */
 @media (min-width:1025px) {
-  .site-actions {
-    left:0;
-    right:0;
-    width:100%;
-    max-width:none;
+  body {
+    padding-left:var(--sidebar-width);
+    padding-right:var(--toc-width);
+  }
+
+  /* Fixed canvas had no offsets and relied on its static position, which body padding moves. */
+  #stars { top:0; left:0; }
+
+  #post {
     box-sizing:border-box;
+    display:block;
+    width:max(var(--card-min), min(var(--card-max), 100% - 2 * var(--content-gutter)));
+    margin:calc(var(--topbar-height) + var(--space-4)) auto var(--space-5);
+  }
+}
+
+/* Contents column: pinned to the card's right edge (same maths as #post above, where the
+   content area is 100% - sidebar - Contents track). */
+@media (min-width:1441px) {
+  .sidebar-right {
+    --area:calc(100% - var(--sidebar-width) - var(--toc-width));
+    left:calc(var(--sidebar-width) + (var(--area) + max(var(--card-min), min(var(--card-max), var(--area) - 2 * var(--content-gutter)))) / 2);
+    right:0;
   }
 }
