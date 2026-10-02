@@ -3869,3 +3869,79 @@ body .nav-tree-children {
   .site-logo { width:30px; height:30px; }
   .site-name { gap:.55rem; }
 }
+
+/* ==========================================================================
+   Light-mode search text + theme-aware pagination
+   Additive only. Every color comes from the existing design tokens
+   (:root = Light, body.dark-theme = Dark), so any theme that redefines those
+   tokens is picked up automatically. Dark Mode keeps its existing
+   body.dark-theme rules above (higher specificity); nothing here targets it.
+   ========================================================================== */
+
+/* ---- 1. Search field: readable text + placeholder outside Dark Mode ----
+   The field is transparent over a decorative tile image, so the typed text
+   had no solid backdrop. Give it the surface color and a strong text color. */
+body:not(.dark-theme) #search input {
+  color: var(--color-text-strong);
+  -webkit-text-fill-color: var(--color-text-strong);
+  caret-color: var(--color-accent);
+  background: var(--color-surface);
+}
+
+body:not(.dark-theme) #search input::placeholder {
+  color: var(--color-text-muted);
+  -webkit-text-fill-color: var(--color-text-muted);
+  opacity: 1; /* Firefox dims placeholders by default */
+}
+
+body:not(.dark-theme) #search input:-webkit-autofill,
+body:not(.dark-theme) #search input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-text-strong);
+  -webkit-box-shadow: 0 0 0 1000px var(--color-surface) inset;
+  caret-color: var(--color-accent);
+}
+
+/* ---- 2. Pagination follows the active theme ----
+   Rings use inset box-shadow (not border) so button size and layout are
+   unchanged. */
+.pagination-container .pagination-number,
+.pagination-container .pagination-button {
+  color: var(--color-text);
+  background: var(--color-surface);
+  box-shadow: inset 0 0 0 1px var(--color-border);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-text) 32%, transparent);
+  transition: background-color var(--motion-fast) ease, color var(--motion-fast) ease, box-shadow var(--motion-fast) ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Hover: background + ring only, so Dark Mode keeps its own hover text color. */
+.pagination-container .pagination-number:not(.active):hover,
+.pagination-container .pagination-button:not(:disabled):not(.disabled):hover {
+  background: var(--color-surface-hover);
+  box-shadow: inset 0 0 0 1px var(--color-accent);
+}
+
+/* Active page: accent fill with the page background as text color
+   (5.4:1 in Light, 13:1 in Dark). Also holds while hovered. */
+.pagination-container .pagination-number.active,
+.pagination-container .pagination-number.active:hover {
+  color: var(--color-bg);
+  background: var(--color-accent);
+  box-shadow: inset 0 0 0 1px var(--color-accent);
+}
+
+/* Disabled prev/next: muted, flat, no hover reaction. */
+.pagination-container .pagination-button:disabled,
+.pagination-container .pagination-button.disabled {
+  color: var(--color-text-muted);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--color-border);
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pagination-container .pagination-number,
+  .pagination-container .pagination-button { transition: none; }
+}

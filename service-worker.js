@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'site-v12-static';
+const CACHE_VERSION = 'site-v13-static';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const OFFLINE_URL = '/offline.html';
@@ -6,7 +6,7 @@ const SHELL = [
   '/',
   '/404.html',
   OFFLINE_URL,
-  '/assets/css/style.css?v=20261001a',
+  '/assets/css/style.css?v=20261002a',
   '/assets/js/common.js',
   '/assets/js/search.js',
   '/assets/js/subject.js',
