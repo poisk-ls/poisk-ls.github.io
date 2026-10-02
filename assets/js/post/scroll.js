@@ -19,5 +19,14 @@ window.PostModules.scroll = function () {
       }
     });
   }
-  document.getElementById('comments-counter')?.addEventListener('click', () => document.getElementById('giscus')?.scrollIntoView({ behavior: 'smooth' }));
+  const commentsCounter = document.getElementById('comments-counter');
+  if (commentsCounter) {
+    const goToComments = () => document.getElementById('giscus')?.scrollIntoView({ behavior: 'smooth' });
+    commentsCounter.addEventListener('click', goToComments);
+    commentsCounter.setAttribute('role', 'button');
+    commentsCounter.setAttribute('tabindex', '0');
+    commentsCounter.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); goToComments(); }
+    });
+  }
 };
