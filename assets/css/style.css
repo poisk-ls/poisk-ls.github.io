@@ -3947,79 +3947,70 @@ body:not(.dark-theme) #search input:-webkit-autofill:focus {
 }
 
 /* ==========================================================================
-   Desktop layout refinement (>=1025px ONLY)
-   - Main content card is centred in the space beside the sidebar
-   - Header (top bar) spans the full viewport width; the sidebar and the table
-     of contents start directly beneath it
-   - Header controls line up with the card's right edge
-   - Excess outer spacing around the card removed
-   Tablet / mobile (<=1024px) are not touched: every rule below sits inside
-   this media query and is purely additive.
-   Percentages below resolve against the viewport / body width (scrollbar
-   excluded), so centring stays exact with or without a scrollbar.
+   Desktop layout fix (>=1025px only)
+   - Header spans the full viewport width (above the sidebar and the content)
+   - Sidebar stays fixed on the left, same width, and now starts under the header
+   - Page card is centered in the content area and re-centers on resize
+   - Less empty space above / below the card
+   Additive override block: appended last so it wins the cascade; no earlier
+   rule is modified. Tablet / mobile (<=1024px) layouts are not affected.
    ========================================================================== */
+:root {
+  --post-reserve:0px;   /* room kept free on the right of the card (desktop only) */
+  --post-gap:2rem;      /* minimum breathing room around the card */
+}
+
 @media (min-width:1025px) {
-  :root {
-    --dsk-side: 18rem;                 /* left column (sidebar) */
-    --dsk-end: 0px;                    /* right column (TOC) - only >=1441px */
-    --dsk-card-max: 54rem;
-    --dsk-gap: var(--space-4, 16px);   /* minimum breathing room beside the card */
-    --dsk-header-gap: max(var(--dsk-gap), calc((100% - var(--dsk-side) - var(--dsk-card-max)) / 2));
+  /* Header: remove the content-column width limit, run edge to edge. */
+  .site-actions {
+    left:0;
+    right:0;
+    width:auto;
+    max-width:none;
+    padding:0 var(--space-5);
   }
 
-  html { scroll-padding-top: calc(var(--topbar-height) + var(--space-4, 16px)); }
-
-  /* Reserve the sidebar column so the card centres in what is left. */
-  body {
-    padding-left: var(--dsk-side);
-    padding-right: var(--dsk-end);
+  /* Sidebar: same fixed left column and width, it just starts below the
+     full-width header (its navigation already scrolls when the window is short). */
+  body .sidebar-left,
+  body.dark-theme .sidebar-left {
+    top:var(--topbar-height);
+    min-height:0;
   }
 
-  /* Card: block-level, auto side margins = true centring (no inline-block
-     baseline gap, no one-sided offset), tighter top/bottom spacing. */
-  body #post {
-    display: block;
-    box-sizing: border-box;
-    width: min(calc(100% - 2 * var(--dsk-gap)), var(--dsk-card-max));
-    max-width: 100%;
-    margin: calc(var(--topbar-height) + var(--space-5, 24px)) auto var(--space-5, 24px);
-  }
-
-  /* Header: full viewport width, content aligned to the card's right edge. */
-  body .site-actions {
-    left: 0;
-    right: 0;
-    width: auto;
-    padding-left: var(--dsk-gap);
-    padding-right: var(--dsk-header-gap);
-    justify-content: flex-end;
-    align-items: center;
-  }
-
-  /* Sidebar + TOC start under the header instead of running behind it. */
-  body .sidebar-left {
-    top: var(--topbar-height);
-    bottom: 0;
-    height: auto;
-    min-height: 0;
-    width: var(--dsk-side);
-  }
-  body .sidebar-right {
-    top: var(--topbar-height);
-    bottom: 0;
-    left: auto;
-    right: 0;
-    height: auto;
-    margin-left: 0;
-    width: var(--dsk-end);
+  /* Page card: width and horizontal position are both derived from the room
+     to the right of the sidebar, so it stays centered at every desktop width.
+     "100%" is the body width, so a classic scrollbar cannot skew the centering. */
+  #post {
+    --post-w:max(44rem, min(54rem, calc(100% - var(--sidebar-width) - var(--post-reserve) - var(--post-gap))));
+    display:block;
+    box-sizing:border-box;
+    width:var(--post-w);
+    margin-top:calc(var(--topbar-height) + var(--space-4));
+    margin-bottom:var(--space-5);
+    margin-right:0;
+    margin-left:max(
+      var(--sidebar-width),
+      calc(var(--sidebar-width) + (100% - var(--sidebar-width) - var(--post-reserve) - var(--post-w)) / 2)
+    );
   }
 }
 
+/* Wide desktop: the sidebar column is wide here, so the card is centered in the
+   space to its right. Post pages keep the "Contents" column (20rem) beside the
+   card; list pages (no Contents) use the whole space. */
 @media (min-width:1441px) {
-  :root {
-    --dsk-side: calc((100% - var(--dsk-card-max)) / 2);
-    --dsk-end: calc((100% - var(--dsk-card-max)) / 2);
-    --dsk-header-gap: calc((100% - var(--dsk-card-max)) / 2);
+  body:not(:has(#category-list)) { --post-reserve:20rem; }
+  #post { --post-w:54rem; }
+  /* "Contents" column follows the card's right edge. (The original rule pinned
+     this box to the right edge, so it is positioned with left/right here.) */
+  .sidebar-right {
+    margin-left:0;
+    width:auto;
+    left:max(
+      calc(var(--sidebar-width) + 54rem),
+      calc(var(--sidebar-width) + (100vw - var(--sidebar-width) - var(--post-reserve) - 54rem) / 2 + 54rem)
+    );
+    right:0;
   }
-  body #post { width: var(--dsk-card-max); }
 }
