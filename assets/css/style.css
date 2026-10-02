@@ -3945,3 +3945,81 @@ body:not(.dark-theme) #search input:-webkit-autofill:focus {
   .pagination-container .pagination-number,
   .pagination-container .pagination-button { transition: none; }
 }
+
+/* ==========================================================================
+   Desktop layout refinement (>=1025px ONLY)
+   - Main content card is centred in the space beside the sidebar
+   - Header (top bar) spans the full viewport width; the sidebar and the table
+     of contents start directly beneath it
+   - Header controls line up with the card's right edge
+   - Excess outer spacing around the card removed
+   Tablet / mobile (<=1024px) are not touched: every rule below sits inside
+   this media query and is purely additive.
+   Percentages below resolve against the viewport / body width (scrollbar
+   excluded), so centring stays exact with or without a scrollbar.
+   ========================================================================== */
+@media (min-width:1025px) {
+  :root {
+    --dsk-side: 18rem;                 /* left column (sidebar) */
+    --dsk-end: 0px;                    /* right column (TOC) - only >=1441px */
+    --dsk-card-max: 54rem;
+    --dsk-gap: var(--space-4, 16px);   /* minimum breathing room beside the card */
+    --dsk-header-gap: max(var(--dsk-gap), calc((100% - var(--dsk-side) - var(--dsk-card-max)) / 2));
+  }
+
+  html { scroll-padding-top: calc(var(--topbar-height) + var(--space-4, 16px)); }
+
+  /* Reserve the sidebar column so the card centres in what is left. */
+  body {
+    padding-left: var(--dsk-side);
+    padding-right: var(--dsk-end);
+  }
+
+  /* Card: block-level, auto side margins = true centring (no inline-block
+     baseline gap, no one-sided offset), tighter top/bottom spacing. */
+  body #post {
+    display: block;
+    box-sizing: border-box;
+    width: min(calc(100% - 2 * var(--dsk-gap)), var(--dsk-card-max));
+    max-width: 100%;
+    margin: calc(var(--topbar-height) + var(--space-5, 24px)) auto var(--space-5, 24px);
+  }
+
+  /* Header: full viewport width, content aligned to the card's right edge. */
+  body .site-actions {
+    left: 0;
+    right: 0;
+    width: auto;
+    padding-left: var(--dsk-gap);
+    padding-right: var(--dsk-header-gap);
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  /* Sidebar + TOC start under the header instead of running behind it. */
+  body .sidebar-left {
+    top: var(--topbar-height);
+    bottom: 0;
+    height: auto;
+    min-height: 0;
+    width: var(--dsk-side);
+  }
+  body .sidebar-right {
+    top: var(--topbar-height);
+    bottom: 0;
+    left: auto;
+    right: 0;
+    height: auto;
+    margin-left: 0;
+    width: var(--dsk-end);
+  }
+}
+
+@media (min-width:1441px) {
+  :root {
+    --dsk-side: calc((100% - var(--dsk-card-max)) / 2);
+    --dsk-end: calc((100% - var(--dsk-card-max)) / 2);
+    --dsk-header-gap: calc((100% - var(--dsk-card-max)) / 2);
+  }
+  body #post { width: var(--dsk-card-max); }
+}
