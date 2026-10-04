@@ -112,6 +112,8 @@ input::-webkit-search-results-decoration {
 #stars {
   display:none;
   position:fixed;
+  top:0;
+  left:0;
   width:100%;
   height:100vh;
   z-index:0;
@@ -572,9 +574,13 @@ body.sidebar-drawer-open .sidebar-drawer {
 
 @media (min-width:1025px) {
   .sidebar-left {
-    position:fixed;
-    inset:var(--topbar-height) auto 0 0;
-    width:var(--sidebar-width);
+    grid-column:1;
+    grid-row:1;
+    align-self:start;
+    position:sticky;
+    top:var(--topbar-height);
+    width:auto;
+    height:calc(100vh - var(--topbar-height));
     min-height:0;
     align-items:stretch;
     background:transparent;
@@ -661,14 +667,6 @@ body.sidebar-drawer-open .sidebar-drawer {
   #contact {
     margin:0 16px;
     padding:8px 0 12px;
-  }
-  .sidebar-right {
-    display:flex;
-    position:fixed;
-    top:0;
-    right:0;
-    height:100%;
-    z-index:2;
   }
 }
 
@@ -1202,8 +1200,8 @@ body.sidebar-drawer-open .sidebar-drawer {
 }
 
 .toc {
-  position:fixed;
-  top:6rem;
+  position:sticky;
+  top:calc(var(--topbar-height) + 2.5rem);
   display: none;
 }
 
@@ -3072,6 +3070,14 @@ body {
   transition: background-color var(--motion-normal) ease, color var(--motion-normal) ease;
 }
 
+/* Desktop: `overflow-x:hidden` forces overflow-y:auto, which makes <body> a scroll container
+   that never scrolls, so position:sticky (sidebar, Contents) would pin against it instead of
+   the viewport. `clip` clips identically without creating a scroll container. Browsers that
+   do not support `clip` keep the `hidden` declaration above. */
+@media (min-width:1025px) {
+  body { overflow-x:clip; }
+}
+
 .sr-only {
   position:absolute;
   width:1px;
@@ -3361,7 +3367,7 @@ html[data-theme="dark"] {
    breakpoint blocks further down. */
 :root {
   --topbar-height: 56px;
-  --sidebar-width: 18rem;      /* mirrors .sidebar-left on desktop */
+  --sidebar-width: 18rem;      /* width of the sidebar grid column on desktop */
   --action-size: 48px;         /* floating touch target (matches back-to-top) */
 }
 @media (min-width:1441px) {
@@ -3914,55 +3920,61 @@ body:not(.dark-theme) #search input:-webkit-autofill:focus {
 }
 
 /* ==========================================================================
-   Desktop layout system (>=1025px)
+   Desktop layout (>=1025px): one CSS grid on <body>, under a full-width header
 
-   Three tracks under one full-width header:
-     [ sidebar ]  [ content area ]  [ Contents ]
-   - Header (.site-actions) is fixed with left:0 / right:0 (see the desktop block above).
-   - Sidebar (.sidebar-left) is fixed, --sidebar-width wide, below the header.
-   - <body> reserves the sidebar track (padding-left) and, on post pages >=1441px, the
-     Contents track (padding-right). What is left is the content area.
-   - #post is a normal block in that area, centred by margin:auto, so it re-centres on
-     every resize and cannot be skewed by a classic scrollbar (percentages resolve
-     against the body's content box, not the window).
-   - --content-gutter is the minimum breathing room on EACH side of the card; the
-     card's width gives way before the gutters do (down to --card-min).
+     header (.site-actions, fixed, left:0 / right:0)  <- body padding-top reserves its height
+     [ sidebar | content area                | Contents ]
+       col 1     col 2 (1fr)                   col 3 (post pages >=1441px)
+
+   - The sidebar is a real column: --sidebar-width wide, sticky below the header, with its
+     own internal scroll (#navigation) so it is always fully reachable.
+   - #post sits in the content column and centres itself there (justify-self:center). Its
+     width is a percentage of that column, so a classic scrollbar cannot skew centring.
+   - --content-gutter is the minimum space on each side of the card; the card narrows
+     (down to --card-min) before the gutters do.
+   - Contents is a third column only on post pages >=1441px; list pages do not render it.
+   Tablet / mobile (<=1024px) never match these rules.
    ========================================================================== */
 :root {
   --card-max:54rem;
   --card-min:38rem;
   --content-gutter:clamp(2.5rem, 6.5vw, 6rem);
-  --toc-width:0px;                 /* width of the Contents track (post pages, >=1441px) */
-}
-
-@media (min-width:1441px) {
-  :root { --toc-width:20rem; }
-  body:has(#category-list) { --toc-width:0px; }   /* list pages have no Contents entries */
+  --toc-width:0px;
 }
 
 @media (min-width:1025px) {
-  body {
-    padding-left:var(--sidebar-width);
-    padding-right:var(--toc-width);
+  /* Only documents that have the sidebar + card structure (offline.html, for example,
+     loads this stylesheet but is a single centred message). */
+  body:has(> #post) {
+    display:grid;
+    grid-template-columns:var(--sidebar-width) minmax(0, 1fr) var(--toc-width);
+    grid-template-rows:auto;
+    padding-top:var(--topbar-height);
+    min-height:100vh;
+    box-sizing:border-box;
   }
 
-  /* Fixed canvas had no offsets and relied on its static position, which body padding moves. */
-  #stars { top:0; left:0; }
-
   #post {
+    grid-column:2;
+    grid-row:1;
+    align-self:start;
+    justify-self:center;
     box-sizing:border-box;
-    display:block;
     width:max(var(--card-min), min(var(--card-max), 100% - 2 * var(--content-gutter)));
-    margin:calc(var(--topbar-height) + var(--space-4)) auto var(--space-5);
+    margin:var(--space-4) 0 var(--space-5);
   }
 }
 
-/* Contents column: pinned to the card's right edge (same maths as #post above, where the
-   content area is 100% - sidebar - Contents track). */
 @media (min-width:1441px) {
-  .sidebar-right {
-    --area:calc(100% - var(--sidebar-width) - var(--toc-width));
-    left:calc(var(--sidebar-width) + (var(--area) + max(var(--card-min), min(var(--card-max), var(--area) - 2 * var(--content-gutter)))) / 2);
-    right:0;
+  /* Post pages only: list pages (#category-list) never get Contents entries, so they have
+     no third column and .sidebar-right stays display:none there (base rule). */
+  body:not(:has(#category-list)) { --toc-width:20rem; }
+  body:not(:has(#category-list)) .sidebar-right {
+    display:block;
+    grid-column:3;
+    grid-row:1;
+    padding-top:2.5rem;
+    box-sizing:border-box;
+    min-width:0;
   }
 }
