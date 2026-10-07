@@ -3978,3 +3978,205 @@ body:not(.dark-theme) #search input:-webkit-autofill:focus {
     min-width:0;
   }
 }
+
+
+/* ==========================================================================
+   Post fixes: responsive table (AFHS), image gallery (Mod-AP), link list (BMS)
+   ========================================================================== */
+
+/* --- Responsive data table ------------------------------------------------ */
+main table.responsive-table {
+  display: table;
+  width: 100%;
+  max-width: 100%;
+  table-layout: auto;
+  white-space: normal;
+  overflow: hidden;
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+
+main table.responsive-table th,
+main table.responsive-table td {
+  max-width: none;
+  text-align: left;
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+main table.responsive-table th:first-child,
+main table.responsive-table td:first-child {
+  width: 34%;
+  white-space: nowrap;
+}
+
+main table.responsive-table tbody tr:nth-child(even) {
+  background: var(--color-surface-muted);
+}
+
+@media (max-width: 600px) {
+  main table.responsive-table,
+  main table.responsive-table tbody,
+  main table.responsive-table tr,
+  main table.responsive-table td {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Header row is replaced by per-cell labels, but stays available to screen readers. */
+  main table.responsive-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    box-shadow: none;
+  }
+
+  main table.responsive-table tbody tr {
+    height: auto;
+    margin: 0 0 .75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--color-surface);
+  }
+
+  main table.responsive-table tbody tr:nth-child(even) {
+    background: var(--color-surface);
+  }
+
+  main table.responsive-table td,
+  main table.responsive-table td:first-child {
+    width: 100%;
+    white-space: normal;
+    border: 0;
+    padding: .6rem .85rem;
+    line-height: 1.5;
+  }
+
+  main table.responsive-table td + td {
+    border-top: 1px solid var(--color-border);
+  }
+
+  main table.responsive-table td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: .15rem;
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+}
+
+/* --- Image gallery (reduced, proportional image size) --------------------- */
+main .image-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+main .image-gallery a {
+  display: block;
+  margin: 0;
+  flex: 0 1 280px;
+  max-width: 100%;
+  line-height: 0;
+}
+
+main .image-gallery img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+@media (max-width: 600px) {
+  main .image-gallery {
+    flex-direction: column;
+    align-items: center;
+  }
+  main .image-gallery a {
+    flex-basis: auto;
+    width: min(100%, 260px);
+  }
+}
+
+/* --- Formal link list ----------------------------------------------------- */
+main ul.link-list {
+  list-style: none;
+  margin: 1.25rem 0 3rem;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: .6rem;
+}
+
+main ul.link-list li {
+  margin: 0;
+  padding: 0;
+}
+
+main ul.link-list a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  min-height: 2.75rem;
+  box-sizing: border-box;
+  padding: .55rem .9rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: #1d4ed8;
+  font-size: .98rem;
+  font-weight: 500;
+  letter-spacing: .01em;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+  transition: background-color .15s, border-color .15s;
+}
+
+main ul.link-list a::before {
+  display: none;
+}
+
+main ul.link-list a i {
+  flex: 0 0 auto;
+  margin: 0 0 0 auto;
+  font-size: .75rem;
+  color: var(--color-text-muted);
+}
+
+main ul.link-list a:hover,
+main ul.link-list a:focus-visible {
+  background: var(--color-surface-hover);
+  border-color: var(--color-accent);
+}
+
+body.dark-theme main ul.link-list a {
+  color: var(--color-link);
+}
+
+body.dark-theme main ul.link-list a:hover,
+body.dark-theme main ul.link-list a:focus-visible {
+  color: var(--color-link-hover);
+}
+
+@media (max-width: 600px) {
+  main ul.link-list {
+    grid-template-columns: 1fr;
+  }
+  main ul.link-list a {
+    min-height: 3rem;
+  }
+}
