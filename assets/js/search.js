@@ -1,6 +1,7 @@
 (() => {
   'use strict';
-  const indexUrl = '/assets/data/search-index.json';
+  const S = p => (window.siteUrl ? window.siteUrl(p) : p);
+  const indexUrl = S('/assets/data/search-index.json');
   let loaded = false;
   let loading = null;
   function loadSearchIndex() {

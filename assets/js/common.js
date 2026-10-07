@@ -1,3 +1,15 @@
+/* Site-root resolver: turns root-absolute data paths ("/assets/...", "/pages/...")
+   into URLs relative to where this script actually lives (assets/js/), so links and
+   images work on file://, any web server and GitHub Pages. Defined once, used by
+   search.js and subject.js as well. */
+window.siteUrl = window.siteUrl || (function () {
+  var root;
+  try { root = new URL('../../', document.currentScript.src).href; } catch (_) { root = location.origin + '/'; }
+  return function (p) {
+    return (typeof p === 'string' && p.charAt(0) === '/' && p.charAt(1) !== '/') ? root + p.slice(1) : p;
+  };
+})();
+
 (() => {
   'use strict';
 
@@ -49,7 +61,7 @@
 
     const normalizePath = value => {
       try {
-        const url = new URL(value, window.location.origin);
+        const url = new URL(value, window.location.href);
         let path = decodeURIComponent(url.pathname || '/');
         const prefix = baseurl || '';
         if (prefix && prefix !== '/' && path.startsWith(prefix)) {
@@ -450,7 +462,7 @@ function searchPost(pages) {
       const li = document.createElement('li');
       li.className = 'result-item';
       const link = document.createElement('a');
-      link.href = post.url || '#';
+      link.href = window.siteUrl(post.url || '#');
       const path = highlightKeyword(post.path || '', keyword) || 'Home';
       if (post.type === 'post') {
         link.innerHTML = `<table><thead><tr><th><svg class="ico-book"></svg></th><th>${highlightKeyword(post.title || '', keyword)}</th></tr></thead><tbody><tr><td><svg class="ico-folder"></svg></td><td>${path}</td></tr><tr><td><svg class="ico-tags"></svg></td><td>${highlightKeyword(post.tags || '', keyword) || 'none'}</td></tr><tr><td><svg class="ico-calendar"></svg></td><td>${escapeHtml(post.date || '')}</td></tr></tbody></table>`;
@@ -501,7 +513,11 @@ function searchRelated(pages, options) {
   // case differences) all compare equal.
   const canonicalUrl = value => {
     let path = String(value || '');
-    try { path = new URL(path, window.location.origin).pathname; } catch (_) { path = path.split(/[?#]/)[0]; }
+    try {
+      path = new URL(window.siteUrl(path), window.location.href).pathname;
+      const rootPath = new URL(window.siteUrl('/'), window.location.href).pathname;
+      if (path.indexOf(rootPath) === 0) path = '/' + path.slice(rootPath.length);
+    } catch (_) { path = path.split(/[?#]/)[0]; }
     try { path = decodeURIComponent(path); } catch (_) { /* keep as-is */ }
     return (path
       .replace(/\/index\.html$/i, '/')
@@ -509,7 +525,7 @@ function searchRelated(pages, options) {
       .replace(/\/+$/, '') || '/').toLowerCase();
   };
 
-  const currentKey = canonicalUrl(opts.currentUrl || window.location.pathname);
+  const currentKey = canonicalUrl(opts.currentUrl || window.location.href);
 
   const tagKey = tag => {
     const raw = String(tag || '').trim().toLowerCase();
@@ -615,17 +631,17 @@ function searchRelated(pages, options) {
     li.className = 'related-item';
 
     const link = document.createElement('a');
-    link.href = page.url;
+    link.href = window.siteUrl(page.url);
     link.setAttribute('aria-label', page.title);
 
     const image = document.createElement('img');
-    image.src = page.image || opts.fallbackImage || '';
+    image.src = window.siteUrl(page.image || opts.fallbackImage || '');
     image.loading = 'lazy';
     image.decoding = 'async';
     image.alt = page.title || '';
     if (opts.fallbackImage) {
       image.addEventListener('error', () => {
-        if (image.getAttribute('src') !== opts.fallbackImage) image.src = opts.fallbackImage;
+        if (image.src !== window.siteUrl(opts.fallbackImage)) image.src = window.siteUrl(opts.fallbackImage);
       }, { once: true });
     }
 

@@ -1150,7 +1150,7 @@ body.sidebar-drawer-open .sidebar-drawer {
     margin:auto 0 auto -5rem;
     padding:8px 24px;
     background-color:rgba(255,255,255,0.95);
-    background-image:url('/assets/img/tile.webp')
+    background-image:url('../img/tile.webp');
     border-radius:6px;
   }
   .article_content .category {
@@ -1623,8 +1623,8 @@ main .highlighter-rouge .highlight pre button {
 }
 
 main .highlighter-rouge .highlight pre button svg {
-  -webkit-mask-image:url('/assets/img/icon/clipboard-regular.svg')
-  mask-image:url('/assets/img/icon/clipboard-regular.svg')
+  -webkit-mask-image:url('../img/icon/clipboard-regular.svg')
+  mask-image:url('../img/icon/clipboard-regular.svg')
   background-color:#555 !important;
   mask-repeat:no-repeat;
   mask-position:center;
@@ -2256,7 +2256,7 @@ and
 }
 
 .input-box:after {
-  background-image:url('/assets/img/tile.webp')
+  background-image:url('../img/tile.webp')
 }
 
 .input-box button {
@@ -2315,23 +2315,23 @@ and
 
 .result-item table .ico-book {
   background-color:dodgerblue !important;
-  -webkit-mask-image:url('/assets/img/icon/book-solid.svg')
-  mask-image:url('/assets/img/icon/book-solid.svg')
+  -webkit-mask-image:url('../img/icon/book-solid.svg')
+  mask-image:url('../img/icon/book-solid.svg')
 }
 
 .result-item table .ico-folder {
-  -webkit-mask-image:url('/assets/img/icon/folder-open-regular.svg')
-  mask-image:url('/assets/img/icon/folder-open-regular.svg')
+  -webkit-mask-image:url('../img/icon/folder-open-regular.svg')
+  mask-image:url('../img/icon/folder-open-regular.svg')
 }
 
 .result-item table .ico-tags {
-  -webkit-mask-image:url('/assets/img/icon/tags-solid.svg')
-  mask-image:url('/assets/img/icon/tags-solid.svg')
+  -webkit-mask-image:url('../img/icon/tags-solid.svg')
+  mask-image:url('../img/icon/tags-solid.svg')
 }
 
 .result-item table .ico-calendar {
-  -webkit-mask-image:url('/assets/img/icon/calendar-days-regular.svg')
-  mask-image:url('/assets/img/icon/calendar-days-regular.svg')
+  -webkit-mask-image:url('../img/icon/calendar-days-regular.svg')
+  mask-image:url('../img/icon/calendar-days-regular.svg')
 }
 
 .result-item table .ico-book,

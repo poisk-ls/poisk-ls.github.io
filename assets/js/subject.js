@@ -19,10 +19,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const prevButton = document.querySelector('#prev-button');
     const pageKey = 'pageKey=' + location.origin + location.pathname;
     let paginationLimit = 5;
-    const SETTINGS_URL = '/assets/data/settings.json';
-    const POSTS_URL = '/assets/data/posts.json';
-    const INDEX_URL = '/assets/data/search-index.json';
-    const FALLBACK_IMAGE = '/assets/img/thumbnail/empty.jpg';
+    const S = p => (window.siteUrl ? window.siteUrl(p) : p);
+    const SETTINGS_URL = S('/assets/data/settings.json');
+    const POSTS_URL = S('/assets/data/posts.json');
+    const INDEX_URL = S('/assets/data/search-index.json');
+    const FALLBACK_IMAGE = S('/assets/img/thumbnail/empty.jpg');
 
     // Only real list entries are paginated; the list is re-read after any
     // reconciliation so page counts always match what is in the DOM.
@@ -154,7 +155,11 @@ document.addEventListener('DOMContentLoaded', function () {
        ------------------------------------------------------------------ */
     const canonicalKey = value => {
         let path = String(value || '');
-        try { path = new URL(path, location.origin).pathname; } catch (_) { path = path.split(/[?#]/)[0]; }
+        try {
+            path = new URL(S(path), location.href).pathname;
+            const rootPath = new URL(S('/'), location.href).pathname;
+            if (path.indexOf(rootPath) === 0) path = '/' + path.slice(rootPath.length);
+        } catch (_) { path = path.split(/[?#]/)[0]; }
         try { path = decodeURIComponent(path); } catch (_) { /* keep as-is */ }
         return (path.replace(/\/index\.html$/i, '/').replace(/\.html$/i, '').replace(/\/+$/, '') || '/').toLowerCase();
     };
@@ -216,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Which posts belong in this list: everything on Home, or the posts inside
     // this category. Returns null when the category cannot be identified.
     const resolveScope = async () => {
-        const here = canonicalKey(location.pathname);
+        const here = canonicalKey(location.href);
         if (here === '/') return () => true;
         const index = await fetchJson(INDEX_URL);
         const category = Array.isArray(index) ? index.find(entry => entry && entry.type === 'category' && canonicalKey(entry.url) === here) : null;
@@ -237,10 +242,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const zone = make('div', 'thumbnail_zone');
         const thumb = make('a', 'thumbnail_post');
-        thumb.href = post.url;
+        thumb.href = S(post.url);
         thumb.setAttribute('aria-label', title);
         const img = make('img');
-        img.src = post.image || FALLBACK_IMAGE;
+        img.src = S(post.image || '') || FALLBACK_IMAGE;
         img.alt = title + ' thumbnail';
         img.loading = 'lazy';
         img.decoding = 'async';
@@ -252,13 +257,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const box = make('div', 'box_contents');
         const titleLink = make('a');
-        titleLink.href = post.url;
+        titleLink.href = S(post.url);
         const heading = make('h1', 'title_post');
         heading.textContent = title;
         titleLink.appendChild(heading);
 
         const excerpt = make('a', 'txt_post');
-        excerpt.href = post.url;
+        excerpt.href = S(post.url);
         excerpt.textContent = decodeEntities(post.excerpt || post.description || '');
 
         const info = make('div', 'info-post');
