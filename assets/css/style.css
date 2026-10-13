@@ -4019,7 +4019,6 @@ main table.responsive-table tbody tr:nth-child(even) {
    tighten it so it fits any phone width without horizontal scrolling. */
 @media (max-width: 600px) {
   main table.responsive-table {
-    table-layout: fixed;
     font-size: clamp(.78rem, 3.4vw, .95rem);
     line-height: 1.4;
   }
@@ -4029,12 +4028,14 @@ main table.responsive-table tbody tr:nth-child(even) {
     height: auto;
   }
 
+  /* break-word (not anywhere): a whole word is never split just to squeeze a
+     column, so the table layout gives "Service" the width its longest name needs
+     and "Description" takes the rest and wraps at spaces. */
   main table.responsive-table th,
   main table.responsive-table td {
     padding: .6rem .55rem;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
     word-break: normal;
-    hyphens: auto;
   }
 
   main table.responsive-table th {
@@ -4045,7 +4046,7 @@ main table.responsive-table tbody tr:nth-child(even) {
 
   main table.responsive-table th:first-child,
   main table.responsive-table td:first-child {
-    width: 40%;
+    width: 1%;
     white-space: normal;
   }
 
