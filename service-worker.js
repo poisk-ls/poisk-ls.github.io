@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'site-v16-static';
+const CACHE_VERSION = 'site-v17-static';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const OFFLINE_URL = '/offline.html';
@@ -6,7 +6,7 @@ const SHELL = [
   '/',
   '/404.html',
   OFFLINE_URL,
-  '/assets/css/style.css?v=20261004a',
+  '/assets/css/style.css?v=20261014c',
   '/assets/js/common.js',
   '/assets/js/search.js',
   '/assets/js/subject.js',
@@ -56,8 +56,21 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  // Stylesheets are network-first: a changed style.css must show up even when the page
+  // still requests the same ?v= string. The cache is only the offline fallback.
+  if (/\.css$/i.test(url.pathname)) {
+    event.respondWith(fetch(request).then(response => {
+      if (response.ok) {
+        const copy = response.clone();
+        caches.open(RUNTIME_CACHE).then(cache => cache.put(request, copy));
+      }
+      return response;
+    }).catch(() => caches.match(request)));
+    return;
+  }
+
   // Cache-first for immutable/static assets; network fallback for anything not cached.
-  if (/\.(?:css|js|webp|png|jpe?g|svg|woff2?|json|webmanifest)$/i.test(url.pathname)) {
+  if (/\.(?:js|webp|png|jpe?g|svg|woff2?|json|webmanifest)$/i.test(url.pathname)) {
     event.respondWith(caches.match(request).then(cached => cached || fetch(request).then(response => {
       const copy = response.clone();
       caches.open(RUNTIME_CACHE).then(cache => cache.put(request, copy));
