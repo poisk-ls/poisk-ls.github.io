@@ -4015,63 +4015,65 @@ main table.responsive-table tbody tr:nth-child(even) {
   background: var(--color-surface-muted);
 }
 
+/* Mobile: keep the desktop two-column layout (Service | Description) and just
+   tighten it so it fits any phone width without horizontal scrolling. */
 @media (max-width: 600px) {
-  main table.responsive-table,
-  main table.responsive-table tbody,
-  main table.responsive-table tr,
-  main table.responsive-table td {
-    display: block;
-    width: 100%;
-    box-sizing: border-box;
+  main table.responsive-table {
+    table-layout: fixed;
+    font-size: clamp(.78rem, 3.4vw, .95rem);
+    line-height: 1.4;
   }
 
-  /* Header row is replaced by per-cell labels, but stays available to screen readers. */
-  main table.responsive-table thead {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
-    box-shadow: none;
-  }
-
+  main table.responsive-table thead tr,
   main table.responsive-table tbody tr {
     height: auto;
-    margin: 0 0 .75rem;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    background: var(--color-surface);
   }
 
-  main table.responsive-table tbody tr:nth-child(even) {
-    background: var(--color-surface);
+  main table.responsive-table th,
+  main table.responsive-table td {
+    padding: .6rem .55rem;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    hyphens: auto;
   }
 
-  main table.responsive-table td,
-  main table.responsive-table td:first-child {
-    width: 100%;
-    white-space: normal;
-    border: 0;
-    padding: .6rem .85rem;
-    line-height: 1.5;
-  }
-
-  main table.responsive-table td + td {
-    border-top: 1px solid var(--color-border);
-  }
-
-  main table.responsive-table td::before {
-    content: attr(data-label);
-    display: block;
-    margin-bottom: .15rem;
+  main table.responsive-table th {
     font-size: .72rem;
-    font-weight: 600;
-    letter-spacing: .06em;
+    letter-spacing: .05em;
     text-transform: uppercase;
-    color: var(--color-text-muted);
   }
+
+  main table.responsive-table th:first-child,
+  main table.responsive-table td:first-child {
+    width: 40%;
+    white-space: normal;
+  }
+
+  /* Labels are only needed for the old stacked layout. */
+  main table.responsive-table td::before {
+    content: none;
+  }
+}
+
+@media (max-width: 360px) {
+  main table.responsive-table th,
+  main table.responsive-table td {
+    padding: .5rem .4rem;
+  }
+}
+
+/* --- Link note blockquote (AFHS) ------------------------------------------
+   The global blockquote rule uses `word-break: break-all`, which splits words
+   anywhere. Here words stay whole and wrap at spaces and hyphens; the
+   break-word fallback only kicks in if a single segment is wider than the box. */
+main blockquote.link-note {
+  word-break: normal;
+  overflow-wrap: break-word;
+  hyphens: manual;
+}
+
+main blockquote.link-note p {
+  text-align: left;
 }
 
 /* --- Image gallery (reduced, proportional image size) --------------------- */
