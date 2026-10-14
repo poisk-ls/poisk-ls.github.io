@@ -4183,3 +4183,57 @@ body.dark-theme main ul.link-list a:focus-visible {
     min-height: 3rem;
   }
 }
+
+
+/* ==========================================================================
+   Desktop UI update (>=1025px only): no top header bar. Search + Theme live in
+   a floating control panel at the bottom-right corner.
+   Same .site-actions element and same buttons (JS hooks .btn-search /
+   .btn-brightness are unchanged); only its desktop presentation changes.
+   Tablet / mobile (<=1024px) are not touched by anything in this block.
+   ========================================================================== */
+@media (min-width:1025px) {
+  :root {
+    /* The top bar is gone, so nothing needs to be reserved for it any more:
+       this releases the body top padding, the sticky sidebar offset/height and
+       the Contents offset, all of which are driven by this token. */
+    --topbar-height: 0px;
+    --floating-panel-gap: 12px;
+    --floating-panel-edge: max(24px, env(safe-area-inset-right, 0px));
+    --floating-panel-bottom: max(24px, env(safe-area-inset-bottom, 0px));
+    --floating-panel-button: 44px;
+    --floating-panel-pad: 8px;
+    --floating-panel-height: calc(var(--floating-panel-button) + 2 * var(--floating-panel-pad) + 2px);
+  }
+
+  /* The old bar becomes a compact floating pill. */
+  .site-actions {
+    top: auto;
+    left: auto;
+    right: var(--floating-panel-edge);
+    bottom: var(--floating-panel-bottom);
+    width: auto;
+    height: auto;
+    padding: var(--floating-panel-pad);
+    gap: var(--space-2);
+    justify-content: center;
+    z-index: 900;              /* above the page, below the search overlay and image viewer */
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-surface-raised);
+    box-shadow: var(--shadow-md);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+  .site-action {
+    width: var(--floating-panel-button);
+    height: var(--floating-panel-button);
+    border-radius: 50%;
+  }
+
+  /* Back-to-top shares this corner: it now sits just above the panel instead of
+     underneath it. */
+  .top-arrow {
+    bottom: calc(var(--floating-panel-bottom) + var(--floating-panel-height) + var(--floating-panel-gap));
+  }
+}
