@@ -7,6 +7,7 @@ const SHELL = [
   '/404.html',
   OFFLINE_URL,
   '/assets/css/style.css?v=20261014c',
+  '/assets/css/dark-felt.css?v=20261017a',
   '/assets/js/common.js',
   '/assets/js/search.js',
   '/assets/js/subject.js',
