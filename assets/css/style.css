@@ -3307,7 +3307,7 @@ html[data-theme="dark"] {
    Back-to-top button (mobile + desktop)
    ========================================================================== */
 :root {
-  --floating-control-size: 48px;
+  --floating-control-size: 40px;
 }
 .top-arrow {
   position:fixed;
@@ -3345,7 +3345,7 @@ html[data-theme="dark"] {
 .top-arrow i {
   position:relative;
   display:block;
-  font-size:1.2rem;
+  font-size:1rem;
   line-height:1;
   pointer-events:none;
 }
@@ -3377,7 +3377,7 @@ html[data-theme="dark"] {
 :root {
   --topbar-height: 56px;
   --sidebar-width: 18rem;      /* width of the sidebar grid column on desktop */
-  --action-size: 48px;         /* floating touch target (matches back-to-top) */
+  --action-size: 40px;         /* floating touch target (matches back-to-top) */
 }
 @media (min-width:1441px) {
   :root { --sidebar-width: calc((100vw - 54rem) / 2); }
@@ -3424,7 +3424,7 @@ html[data-theme="dark"] {
 }
 .site-action-icon i {
   grid-area:1 / 1;
-  font-size:1.05rem;
+  font-size:.95rem;
   line-height:1;
 }
 /* Theme button shows only the icon of the theme that is active. */
@@ -3555,7 +3555,7 @@ body .nav-list-expander:focus-visible {
 #contact hr { margin:0 0 10px; }
 #contact .contact-list { gap:2px; }
 #contact .contact-list li a { width:36px; min-width:36px; min-height:36px; border-radius:10px; }
-#contact > span { font-size:.72rem; }
+#contact > span { font-size:.8125rem; }
 
 /* ---- Desktop ---- */
 @media (min-width:1025px) {
@@ -3635,7 +3635,7 @@ body .nav-list-expander:focus-visible {
     gap:10px;
     justify-content:flex-start;
   }
-  #btn-nav { order:-1; }
+  #btn-nav { order:2; margin-left:auto; }   /* hamburger on the right edge of the header */
   .sidebar-brand { flex:1 1 auto; min-width:0; }
   .site-name mark { font-size:1.05rem; overflow-wrap:normal; white-space:nowrap; }
 
@@ -3667,9 +3667,15 @@ body .nav-list-expander:focus-visible {
     padding-bottom:calc(var(--action-size) + var(--mobile-floating-bottom) + var(--space-3));
   }
 
+  /* The menu button is on the right, so the drawer slides in from the right too. */
   .sidebar-drawer {
+    left:auto;
+    right:0;
     width:min(86vw, 320px);
     padding-bottom:env(safe-area-inset-bottom, 0px);
+    border-right:0;
+    border-left:1px solid var(--color-border);
+    transform:translateX(102%);
   }
   .sidebar-drawer #navigation { padding:12px 10px 8px; }
 
@@ -4210,8 +4216,8 @@ body.dark-theme main ul.link-list a:focus-visible {
     --floating-panel-gap: 12px;
     --floating-panel-edge: max(24px, env(safe-area-inset-right, 0px));
     --floating-panel-bottom: max(24px, env(safe-area-inset-bottom, 0px));
-    --floating-panel-button: 44px;
-    --floating-panel-pad: 8px;
+    --floating-panel-button: 36px;
+    --floating-panel-pad: 6px;
     --floating-panel-height: calc(var(--floating-panel-button) + 2 * var(--floating-panel-pad) + 2px);
   }
 
@@ -4541,18 +4547,10 @@ html[data-post-view="list"] #category-list.posts-view .article_content .txt_post
 }
 
 /* ==========================================================================
-   Grid / List toggle on the other repeated-content sections
-   - Category pages reuse the #category-list.posts-view rules above (the class is
-     added in their markup), so they need nothing more here.
-   - "You May Also Like" (#related-box) gets its own two layouts below. Same
-     <html data-post-view> switch, same saved choice, same toggle buttons.
+   "You May Also Like": a plain responsive grid (no view toggle).
+   2 columns on phones, 3 from 769px. Replaces the old floats so every card shares
+   one width and a short last row never leaves odd gaps.
    ========================================================================== */
-
-/* Toolbar variant that sits under a section heading instead of the page title. */
-.view-toolbar--inline { margin:.5rem 0 0; }
-
-/* Grid (default): 2 columns on phones, 3 from 769px; replaces the old floats so a
-   short last row never leaves odd gaps and cards always share one width. */
 #related-box #related-posts {
   display:grid;
   grid-template-columns:repeat(2, minmax(0, 1fr));
@@ -4576,56 +4574,3 @@ html[data-post-view="list"] #category-list.posts-view .article_content .txt_post
 @media (min-width:769px) {
   #related-box #related-posts { grid-template-columns:repeat(3, minmax(0, 1fr)); gap:2rem 1.5rem; }
 }
-
-/* List: one row per item, small thumbnail on the left, text on the right. */
-html[data-post-view="list"] #related-box #related-posts { grid-template-columns:minmax(0, 1fr); gap:.5rem; }
-
-html[data-post-view="list"] #related-box #related-posts li { margin:0; }
-
-html[data-post-view="list"] #related-box #related-posts li a {
-  display:grid;
-  grid-template-columns:clamp(5.5rem, 24vw, 9rem) minmax(0, 1fr);
-  grid-template-rows:auto auto auto;
-  align-content:center;
-  column-gap:.875rem;
-  padding:.5rem;
-}
-
-html[data-post-view="list"] #related-box #related-posts li a img {
-  grid-column:1;
-  grid-row:1 / span 3;
-  align-self:center;
-}
-
-html[data-post-view="list"] #related-box #related-posts li a p {
-  grid-column:2;
-  margin:.125rem 0;
-}
-
-html[data-post-view="list"] #related-box #related-posts .title {
-  height:auto;
-  max-height:2.5em;
-  font-size:1rem;
-}
-
-/* The grid-scale hover (scale(1.05)) would overflow a full-width row; use a lift instead. */
-html[data-post-view="list"] #related-box #related-posts li:hover {
-  -webkit-transform:none;
-  transform:none;
-}
-
-@media (min-width:769px) {
-  html[data-post-view="list"] #related-box #related-posts li a { column-gap:1.25rem; padding:.75rem; }
-  html[data-post-view="list"] #related-box #related-posts .title { font-size:1.125rem; }
-}
-
-/* Inside <main> the page's generic block rules apply to the inline toolbar; pin it to the right edge. */
-#related-box .view-toolbar--inline {
-  display:flex;
-  justify-content:flex-end;
-  width:100%;
-  margin:.5rem 0 0;
-  padding:0;
-}
-#related-box .view-toolbar--inline .view-toggle { margin:0; }
-#related-box .view-toolbar--inline + #related-posts { margin-top:.75rem; }

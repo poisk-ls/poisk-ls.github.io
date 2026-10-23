@@ -1,6 +1,6 @@
 /* ==========================================================================
    Grid / List view toggle, shared by every page that shows repeated content:
-   the All Posts list (index), every category list, and "You May Also Like".
+   the All Posts list (index) and every category list.
 
    - The layout itself is pure CSS, keyed on <html data-post-view="grid|list">.
      An inline script in <head> restores the saved value before first paint, so
@@ -27,9 +27,8 @@
     /* ---- Sections that get a toggle: where to put it and what it controls ---- */
     var SECTIONS = [
         // Category / All Posts lists: toolbar goes right above the list.
-        { selector: '#category-list', where: 'before', label: 'Post layout', addClass: 'posts-view' },
-        // "You May Also Like": toolbar goes right under the heading.
-        { selector: '#related-box', where: 'afterHeading', label: 'Related posts layout', inline: true }
+        // ("You May Also Like" intentionally has no toggle.)
+        { selector: '#category-list', label: 'Post layout', addClass: 'posts-view' }
     ];
 
     var ICON_GRID = '<svg class="view-toggle-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true" focusable="false"><rect x="3" y="3" width="8" height="8" rx="1.75"/><rect x="13" y="3" width="8" height="8" rx="1.75"/><rect x="3" y="13" width="8" height="8" rx="1.75"/><rect x="13" y="13" width="8" height="8" rx="1.75"/></svg>';
@@ -59,7 +58,7 @@
 
     function makeToolbar(section) {
         var bar = document.createElement('div');
-        bar.className = 'view-toolbar' + (section.inline ? ' view-toolbar--inline' : '');
+        bar.className = 'view-toolbar';
         bar.innerHTML =
             '<div class="view-toggle" role="group" aria-label="' + section.label + '">' +
             '<button type="button" class="view-toggle-btn" data-view="grid" aria-pressed="false" aria-label="Grid view" title="Grid view">' + ICON_GRID + '</button>' +
@@ -74,18 +73,10 @@
             if (!el) return;
             if (section.addClass) el.classList.add(section.addClass);
 
-            if (section.where === 'before') {
-                // Keep a toolbar that is already in the page markup (index.html).
-                var prev = el.previousElementSibling;
-                if (prev && prev.classList.contains('view-toolbar')) return;
-                el.parentNode.insertBefore(makeToolbar(section), el);
-            } else {
-                if (el.querySelector(':scope > .view-toolbar')) return;
-                var heading = el.firstElementChild;
-                var bar = makeToolbar(section);
-                if (heading) heading.insertAdjacentElement('afterend', bar);
-                else el.insertBefore(bar, el.firstChild);
-            }
+            // Keep a toolbar that is already in the page markup (index.html).
+            var prev = el.previousElementSibling;
+            if (prev && prev.classList.contains('view-toolbar')) return;
+            el.parentNode.insertBefore(makeToolbar(section), el);
         });
     }
 
