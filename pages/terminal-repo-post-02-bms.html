@@ -21,7 +21,33 @@
     <meta name="giscus_category" content="Announcements">
     <meta name="giscus_categoryId" content="DIC_kwDOU0C8Rs4DGsIx">
     <script>(function () {var d = document.documentElement, t = 'dark'; try {if (localStorage.getItem('theme') === 'light') t = 'light';} catch (e) { } d.dataset.theme = t; d.classList.toggle('theme-light', t === 'light'); d.style.colorScheme = t; var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', t === 'light' ? '#f7f5f2' : '#05070a');})();</script>
-<script>(function(){try{var v=localStorage.getItem('postView');if(v==='grid'||v==='list')document.documentElement.dataset.postView=v;}catch(e){}})();</script></head>
+<script>(function(){try{var v=localStorage.getItem('postView');if(v==='grid'||v==='list')document.documentElement.dataset.postView=v;}catch(e){}})();</script><style>
+/* Best-Modded-Site link grid: the same 2 columns on every screen size.
+   Scoped to this page; sits after style.css so it overrides its 1-column phone rule. */
+main ul.link-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .6rem;
+}
+main ul.link-list li { min-width: 0; }
+main ul.link-list a {
+  height: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+@media (max-width: 600px) {
+  main ul.link-list { gap: .5rem; }
+  main ul.link-list a {
+    min-height: 3rem;
+    gap: .4rem;
+    padding: .5rem .6rem;
+    font-size: .85rem;
+    line-height: 1.3;
+  }
+  main ul.link-list a i { font-size: .65rem; }
+}
+</style>
+</head>
 
 <body>
     <script>document.body.classList.toggle('dark-theme', document.documentElement.dataset.theme !== 'light');</script>
