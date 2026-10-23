@@ -1,25 +1,25 @@
 [
   {
     "title": "About",
-    "url": "/pages/about.html",
+    "url": "/pages/about",
     "source": "About/index.md",
     "postCount": 3
   },
   {
     "title": "CMD",
-    "url": "/pages/terminal-cmd.html",
+    "url": "/pages/terminal-cmd",
     "source": "Terminal/CMD/index.md",
     "postCount": 1
   },
   {
     "title": "Repo",
-    "url": "/pages/terminal-repo.html",
+    "url": "/pages/terminal-repo",
     "source": "Terminal/Repo/index.md",
     "postCount": 6
   },
   {
     "title": "Terminal",
-    "url": "/pages/terminal.html",
+    "url": "/pages/terminal",
     "source": "Terminal/index.md",
     "postCount": 7
   },
