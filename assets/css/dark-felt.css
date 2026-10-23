@@ -329,12 +329,17 @@ body.dark-theme #post .inner-header {
   border-radius: 0;
 }
 body.dark-theme .inner-header .dot {
-  background: transparent !important;       /* inline style sets the traffic-light colours */
-  border: 1px solid var(--felt-dim);
-  border-radius: 0;
-  width: .7rem;
-  height: .7rem;
+  /* Keep the inline red/yellow/green fills visible on the dark title bar. */
+  border: 1px solid rgba(0, 0, 0, .55);
+  border-radius: 50%;
+  width: .8rem;
+  height: .8rem;
+  opacity: 1;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .18);
 }
+body.dark-theme .inner-header .dot:nth-child(1) { background-color: #F86158 !important; }
+body.dark-theme .inner-header .dot:nth-child(2) { background-color: #FBBF2D !important; }
+body.dark-theme .inner-header .dot:nth-child(3) { background-color: #2ACB45 !important; }
 
 body.dark-theme .category-tree p { color: var(--felt-muted); font-weight: 500; }
 body.dark-theme .category-tree p,
