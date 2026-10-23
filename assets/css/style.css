@@ -4246,3 +4246,296 @@ body.dark-theme main ul.link-list a:focus-visible {
     bottom: calc(var(--floating-panel-bottom) + var(--floating-panel-height) + var(--floating-panel-gap));
   }
 }
+
+/* ==========================================================================
+   All Posts: Grid / List view toggle
+   Additive block. Scoped to the home list (#category-list.posts-view), so the
+   category pages keep their existing layout. Every color, radius, shadow and
+   motion value comes from the existing design tokens, so Light and Dark are
+   both themed automatically (dark-felt.css adds only its square-corner tweaks).
+
+   The layout is chosen by <html data-post-view="grid|list">; Grid is the
+   default when the attribute is missing. The pre-paint restore script lives in
+   <head> and assets/js/view-toggle.js handles the clicks.
+
+   Both views only restyle the existing markup. Items are never hidden or
+   reordered here, so pagination (.hidden on <li>) keeps working untouched.
+   ========================================================================== */
+
+/* ---- 1. Toolbar + segmented toggle (sits right under the "All Posts" heading) ---- */
+.view-toolbar {
+  display:flex;
+  justify-content:flex-end;
+  margin:-8px 8px 12px;
+}
+
+.view-toggle {
+  display:inline-flex;
+}
+
+.view-toggle-btn {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:2.75rem;
+  height:2.75rem;
+  margin:0;
+  padding:0;
+  border:0;
+  color:var(--color-text);
+  background:var(--color-surface);
+  box-shadow:inset 0 0 0 1px var(--color-border);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--color-text) 32%, transparent);
+  cursor:pointer;
+  transition:background-color var(--motion-fast) ease, color var(--motion-fast) ease, box-shadow var(--motion-fast) ease;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+
+.view-toggle-btn:first-child { border-radius:.25rem 0 0 .25rem; }
+.view-toggle-btn:last-child { border-radius:0 .25rem .25rem 0; margin-left:-1px; }
+
+/* The site has a global `svg { width:16px; fill:<fixed color>; margin:auto }` rule, and
+   `body.dark-theme svg { fill:currentcolor }`. Size and fill are pinned here (with enough
+   specificity to beat both) so the icon always follows the button's text color. */
+.view-toggle-btn .view-toggle-icon {
+  display:block;
+  flex:0 0 auto;
+  width:1.25rem;
+  height:1.25rem;
+  margin:0;
+  aspect-ratio:auto;
+  fill:currentColor;
+  pointer-events:none;
+}
+
+.view-toggle-btn[data-view="list"] .view-toggle-icon { fill:none; }
+
+.view-toggle-btn:hover {
+  background:var(--color-surface-hover);
+  box-shadow:inset 0 0 0 1px var(--color-accent);
+  position:relative;
+  z-index:1;
+}
+
+/* Selected view: solid accent fill (same treatment as the active page number).
+   Driven by the same <html> attribute as the layout, so it is correct from the
+   first paint and can never disagree with what is on screen. */
+html:not([data-post-view="list"]) .view-toggle-btn[data-view="grid"],
+html[data-post-view="list"] .view-toggle-btn[data-view="list"] {
+  color:var(--color-bg);
+  background:var(--color-accent);
+  box-shadow:inset 0 0 0 1px var(--color-accent);
+  position:relative;
+  z-index:1;
+  cursor:default;
+}
+
+.view-toggle-btn:focus-visible {
+  outline:2px solid var(--color-focus);
+  outline-offset:2px;
+  position:relative;
+  z-index:2;
+}
+
+@media (min-width:769px) {
+  .view-toolbar { margin:-1.5rem 2rem 1.5rem; }
+  .view-toggle-btn { width:2.5rem; height:2.5rem; }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .view-toggle-btn { transition:none; }
+}
+
+@media (forced-colors:active) {
+  html:not([data-post-view="list"]) .view-toggle-btn[data-view="grid"],
+  html[data-post-view="list"] .view-toggle-btn[data-view="list"] {
+    color:HighlightText;
+    background:Highlight;
+    forced-color-adjust:none;
+  }
+}
+
+/* ---- 2. Shared reset of the desktop "row with overlapping panel" layout ----
+   The existing desktop rules give each item a fixed height, a negative margin
+   and a tiled panel background. Both new views replace that, so neutralize it
+   once here. The #id keeps these ahead of the existing media-query rules. */
+#category-list.posts-view .paginated-list { margin:0 8px; }
+
+#category-list.posts-view .paginated-item {
+  margin:0;
+  height:auto;
+  min-width:0;
+}
+
+#category-list.posts-view .article_content {
+  display:flex;
+  transform:none;
+  transition:transform var(--motion-normal) ease, box-shadow var(--motion-normal) ease, background-color var(--motion-fast) ease;
+}
+
+#category-list.posts-view .article_content .thumbnail_post {
+  width:100%;
+  height:auto;
+  margin:0;
+  aspect-ratio:5/3;
+}
+
+#category-list.posts-view .article_content .box_contents {
+  flex:1 1 auto;
+  width:auto;
+  min-width:0;
+  margin:0;
+  background:none;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+}
+
+/* Two-line title instead of one clipped line, so long titles stay readable in both views. */
+#category-list.posts-view .article_content .title_post {
+  display:-webkit-box;
+  padding-top:0;
+  font-size:1.0625rem;
+  line-height:1.4;
+  white-space:normal;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+#category-list.posts-view .article_content .txt_post {
+  margin:.25rem 0 .5rem;
+  font-size:.875rem;
+  line-height:1.5;
+}
+
+#category-list.posts-view .article_content .info-post,
+#category-list.posts-view .article_content .date,
+#category-list.posts-view .article_content .category {
+  font-size:.8125rem;
+}
+
+@media (min-width:769px) {
+  #category-list.posts-view .paginated-list { margin:0 2rem; }
+}
+
+/* ---- 3. Grid view (default): cards in a responsive grid ----
+   Two columns at every width, phones included. minmax(0, 1fr) lets the columns
+   shrink below their content so long titles/URLs can never force overflow;
+   the compact phone sizing is in the max-width:35.99rem block further down. */
+html:not([data-post-view="list"]) #category-list.posts-view .paginated-list {
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:.625rem;
+}
+
+html:not([data-post-view="list"]) #category-list.posts-view .article_content {
+  flex-direction:column;
+  height:100%;
+  overflow:hidden;
+  background:var(--color-surface);
+  border:1px solid var(--color-border);
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-sm);
+}
+
+html:not([data-post-view="list"]) #category-list.posts-view .article_content .box_contents {
+  display:flex;
+  flex-direction:column;
+  padding:.875rem 1rem 1rem;
+}
+
+/* Category / date always sit on the card's bottom edge, so they line up across a row. */
+html:not([data-post-view="list"]) #category-list.posts-view .article_content .info-post {
+  margin-top:auto;
+  padding-top:.25rem;
+}
+
+@media (min-width:36rem) {
+  html:not([data-post-view="list"]) #category-list.posts-view .paginated-list { gap:1rem; }
+}
+
+@media (min-width:769px) {
+  html:not([data-post-view="list"]) #category-list.posts-view .paginated-list { gap:1.25rem; }
+}
+
+/* Phones: same two-column grid, scaled down so cards stay readable and even. */
+@media (max-width:35.99rem) {
+  html:not([data-post-view="list"]) #category-list.posts-view .article_content .box_contents {
+    padding:.5rem .625rem .625rem;
+  }
+  html:not([data-post-view="list"]) #category-list.posts-view .article_content .title_post {
+    font-size:.9rem;
+    line-height:1.3;
+  }
+  html:not([data-post-view="list"]) #category-list.posts-view .article_content .txt_post {
+    margin:.2rem 0 .4rem;
+    font-size:.75rem;
+    line-height:1.4;
+    -webkit-line-clamp:3;
+    overflow-wrap:anywhere;
+  }
+  html:not([data-post-view="list"]) #category-list.posts-view .article_content .info-post {
+    display:flex;
+    flex-wrap:wrap;
+    column-gap:.25rem;
+    font-size:.6875rem;
+  }
+  html:not([data-post-view="list"]) #category-list.posts-view .article_content .date,
+  html:not([data-post-view="list"]) #category-list.posts-view .article_content .category {
+    font-size:.6875rem;
+  }
+}
+
+@media (hover:hover) and (prefers-reduced-motion:no-preference) {
+  html:not([data-post-view="list"]) #category-list.posts-view .article_content:hover {
+    transform:translateY(-3px);
+    box-shadow:var(--shadow-md);
+  }
+}
+
+/* ---- 4. List view: a compact vertical list, small thumbnail on the left ---- */
+html[data-post-view="list"] #category-list.posts-view .article_content {
+  flex-direction:row;
+  align-items:center;
+  gap:.875rem;
+  padding:.75rem .5rem;
+  background:transparent;
+  border:0;
+  border-bottom:1px solid var(--color-border);
+  border-radius:0;
+  box-shadow:none;
+}
+
+html[data-post-view="list"] #category-list.posts-view .article_content .thumbnail_zone {
+  flex:0 0 clamp(5.5rem, 22vw, 9rem);
+  width:clamp(5.5rem, 22vw, 9rem);
+}
+
+html[data-post-view="list"] #category-list.posts-view .article_content .thumbnail_post {
+  border-radius:var(--radius-sm);
+}
+
+html[data-post-view="list"] #category-list.posts-view .article_content .txt_post {
+  -webkit-line-clamp:1;
+  margin:.125rem 0 .375rem;
+}
+
+@media (min-width:769px) {
+  html[data-post-view="list"] #category-list.posts-view .article_content {
+    gap:1.25rem;
+    padding:.875rem 1rem;
+  }
+  html[data-post-view="list"] #category-list.posts-view .article_content .title_post { font-size:1.125rem; }
+  html[data-post-view="list"] #category-list.posts-view .article_content .txt_post {
+    -webkit-line-clamp:2;
+    font-size:.9375rem;
+  }
+}
+
+@media (hover:hover) {
+  html[data-post-view="list"] #category-list.posts-view .article_content:hover {
+    background:var(--color-surface-hover);
+  }
+}

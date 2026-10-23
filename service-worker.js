@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'site-v17-static';
+const CACHE_VERSION = 'site-v20-static';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const OFFLINE_URL = '/offline.html';
@@ -6,17 +6,19 @@ const SHELL = [
   '/',
   '/404.html',
   OFFLINE_URL,
-  '/assets/css/style.css?v=20261024a',
-  '/assets/css/dark-felt.css?v=20261024a',
+  '/assets/css/style.css?v=20261024b',
+  '/assets/css/dark-felt.css?v=20261024b',
   '/assets/js/common.js',
   '/assets/js/search.js',
   '/assets/js/subject.js',
+  '/assets/js/view-toggle.js',
   '/assets/js/image-viewer.js',
   '/assets/js/pwa-install.js',
   '/assets/js/background.js',
   '/assets/css/highlight.min.css',
   '/assets/data/search-index.json',
   '/assets/data/posts.json',
+  '/assets/data/settings.json',
   '/assets/data/navigation.json',
   '/manifest.webmanifest'
 ];

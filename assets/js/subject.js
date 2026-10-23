@@ -18,7 +18,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const nextButton = document.querySelector('#next-button');
     const prevButton = document.querySelector('#prev-button');
     const pageKey = 'pageKey=' + location.origin + location.pathname;
-    let paginationLimit = 5;
+    // The home grid is 1 column on phones and 2 from 36rem up, so a page must hold a
+    // multiple of 2 cards or its last row is left with an empty cell. 6 also fills a
+    // 3-column row. Every value from settings.json is rounded up to that multiple.
+    const GRID_STEP = paginatedList.closest('.posts-view') ? 2 : 1;
+    const alignToGrid = n => Math.ceil(n / GRID_STEP) * GRID_STEP;
+    let paginationLimit = alignToGrid(6);
     const S = p => (window.siteUrl ? window.siteUrl(p) : p);
     const SETTINGS_URL = S('/assets/data/settings.json');
     const POSTS_URL = S('/assets/data/posts.json');
@@ -214,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const loadItemsPerPage = async () => {
         try {
             const value = Number((await fetchJson(SETTINGS_URL))?.pagination?.itemsPerPage);
-            return Number.isInteger(value) && value > 0 ? value : null;
+            return Number.isInteger(value) && value > 0 ? alignToGrid(value) : null;
         } catch (_) { return null; }
     };
 

@@ -7,7 +7,7 @@
     ]
   },
   "pagination": {
-    "itemsPerPage": 5
+    "itemsPerPage": 6
   },
   "search": {
     "index": "/assets/data/search-index.json"

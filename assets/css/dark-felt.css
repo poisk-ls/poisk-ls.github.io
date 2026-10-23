@@ -396,6 +396,17 @@ body.dark-theme .article_content .category {
 body.dark-theme .article_content .category:hover { color: #fff !important; }
 body.dark-theme .article_content .date { color: var(--felt-dim); letter-spacing: .05em; }
 
+/* ---------- 9b. All Posts: Grid / List toggle ----------------------------
+   style.css themes the toggle and both layouts from the tokens above (selected =
+   white fill / black icon, like the active page number). Only the felt specifics
+   live here: square corners, and a hover on the NOT-selected button that stays
+   clearly different from the solid selected state. */
+body.dark-theme .view-toggle-btn { border-radius: 0; }
+html:not([data-post-view="list"]) body.dark-theme .view-toggle-btn[data-view="list"]:hover,
+html[data-post-view="list"] body.dark-theme .view-toggle-btn[data-view="grid"]:hover { color: #fff; }
+body.dark-theme #category-list.posts-view .article_content,
+body.dark-theme #category-list.posts-view .article_content .thumbnail_post { border-radius: 0; }
+
 /* ---------- 10. Pagination ---------------------------------------------- */
 body.dark-theme .pagination-container .pagination-number,
 body.dark-theme .pagination-container .pagination-button {
