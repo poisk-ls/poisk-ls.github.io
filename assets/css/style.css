@@ -4539,3 +4539,93 @@ html[data-post-view="list"] #category-list.posts-view .article_content .txt_post
     background:var(--color-surface-hover);
   }
 }
+
+/* ==========================================================================
+   Grid / List toggle on the other repeated-content sections
+   - Category pages reuse the #category-list.posts-view rules above (the class is
+     added in their markup), so they need nothing more here.
+   - "You May Also Like" (#related-box) gets its own two layouts below. Same
+     <html data-post-view> switch, same saved choice, same toggle buttons.
+   ========================================================================== */
+
+/* Toolbar variant that sits under a section heading instead of the page title. */
+.view-toolbar--inline { margin:.5rem 0 0; }
+
+/* Grid (default): 2 columns on phones, 3 from 769px; replaces the old floats so a
+   short last row never leaves odd gaps and cards always share one width. */
+#related-box #related-posts {
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:1.25rem .75rem;
+  margin:1rem 0;
+}
+
+#related-box #related-posts li {
+  float:none;
+  width:auto;
+  min-width:0;
+  margin:0;
+}
+
+#related-box #related-posts li:nth-child(n) { margin-left:0; }
+
+#related-box #related-posts .title,
+#related-box #related-posts .category,
+#related-box #related-posts .date { overflow-wrap:anywhere; }
+
+@media (min-width:769px) {
+  #related-box #related-posts { grid-template-columns:repeat(3, minmax(0, 1fr)); gap:2rem 1.5rem; }
+}
+
+/* List: one row per item, small thumbnail on the left, text on the right. */
+html[data-post-view="list"] #related-box #related-posts { grid-template-columns:minmax(0, 1fr); gap:.5rem; }
+
+html[data-post-view="list"] #related-box #related-posts li { margin:0; }
+
+html[data-post-view="list"] #related-box #related-posts li a {
+  display:grid;
+  grid-template-columns:clamp(5.5rem, 24vw, 9rem) minmax(0, 1fr);
+  grid-template-rows:auto auto auto;
+  align-content:center;
+  column-gap:.875rem;
+  padding:.5rem;
+}
+
+html[data-post-view="list"] #related-box #related-posts li a img {
+  grid-column:1;
+  grid-row:1 / span 3;
+  align-self:center;
+}
+
+html[data-post-view="list"] #related-box #related-posts li a p {
+  grid-column:2;
+  margin:.125rem 0;
+}
+
+html[data-post-view="list"] #related-box #related-posts .title {
+  height:auto;
+  max-height:2.5em;
+  font-size:1rem;
+}
+
+/* The grid-scale hover (scale(1.05)) would overflow a full-width row; use a lift instead. */
+html[data-post-view="list"] #related-box #related-posts li:hover {
+  -webkit-transform:none;
+  transform:none;
+}
+
+@media (min-width:769px) {
+  html[data-post-view="list"] #related-box #related-posts li a { column-gap:1.25rem; padding:.75rem; }
+  html[data-post-view="list"] #related-box #related-posts .title { font-size:1.125rem; }
+}
+
+/* Inside <main> the page's generic block rules apply to the inline toolbar; pin it to the right edge. */
+#related-box .view-toolbar--inline {
+  display:flex;
+  justify-content:flex-end;
+  width:100%;
+  margin:.5rem 0 0;
+  padding:0;
+}
+#related-box .view-toolbar--inline .view-toggle { margin:0; }
+#related-box .view-toolbar--inline + #related-posts { margin-top:.75rem; }

@@ -1,15 +1,20 @@
 /* ==========================================================================
-   Grid / List view toggle for the All Posts section (index.html).
+   Grid / List view toggle, shared by every page that shows repeated content:
+   the All Posts list (index), every category list, and "You May Also Like".
 
    - The layout itself is pure CSS, keyed on <html data-post-view="grid|list">.
      An inline script in <head> restores the saved value before first paint, so
-     there is no flash of the wrong layout on refresh.
-   - This file only (1) switches that attribute when a toggle button is used,
-     (2) keeps aria-pressed in sync for assistive tech, and (3) remembers the
-     choice in localStorage. It never touches the list items, so pagination,
-     the post data and everything in subject.js behave exactly as before.
-   - If localStorage is unavailable (private mode, blocked), the toggle still
-     works for the current page view; it just isn't remembered.
+     there is no flash of the wrong layout on load or navigation.
+   - ONE choice is stored (localStorage "postView") and applied everywhere, so the
+     view picked on one page is the view on every other page.
+   - Toggles are created from one template. A page that already contains a
+     .view-toolbar (the index) keeps it; for the other sections the toolbar is
+     inserted automatically. To add the toggle to a new repeated-content section,
+     add one entry to SECTIONS below and style it with the data-post-view attribute.
+   - Only the attribute and the buttons' aria-pressed state change; list items are
+     never touched, so pagination, post data and subject.js behave exactly as before.
+   - If localStorage is unavailable (private mode, blocked) the toggle still works
+     for the current page; it just isn't remembered.
    ========================================================================== */
 (function () {
     'use strict';
@@ -17,13 +22,18 @@
     var STORAGE_KEY = 'postView';
     var DEFAULT_VIEW = 'grid';
     var VIEWS = ['grid', 'list'];
-
     var root = document.documentElement;
-    var toggle = document.querySelector('.view-toggle');
-    if (!toggle) return;
 
-    var buttons = Array.prototype.slice.call(toggle.querySelectorAll('[data-view]'));
-    if (!buttons.length) return;
+    /* ---- Sections that get a toggle: where to put it and what it controls ---- */
+    var SECTIONS = [
+        // Category / All Posts lists: toolbar goes right above the list.
+        { selector: '#category-list', where: 'before', label: 'Post layout', addClass: 'posts-view' },
+        // "You May Also Like": toolbar goes right under the heading.
+        { selector: '#related-box', where: 'afterHeading', label: 'Related posts layout', inline: true }
+    ];
+
+    var ICON_GRID = '<svg class="view-toggle-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true" focusable="false"><rect x="3" y="3" width="8" height="8" rx="1.75"/><rect x="13" y="3" width="8" height="8" rx="1.75"/><rect x="3" y="13" width="8" height="8" rx="1.75"/><rect x="13" y="13" width="8" height="8" rx="1.75"/></svg>';
+    var ICON_LIST = '<svg class="view-toggle-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><line x1="9" y1="6" x2="20.5" y2="6"/><line x1="9" y1="12" x2="20.5" y2="12"/><line x1="9" y1="18" x2="20.5" y2="18"/><line x1="3.5" y1="6" x2="4.5" y2="6"/><line x1="3.5" y1="12" x2="4.5" y2="12"/><line x1="3.5" y1="18" x2="4.5" y2="18"/></svg>';
 
     function readSaved() {
         var value = null;
@@ -35,16 +45,54 @@
         try { localStorage.setItem(STORAGE_KEY, view); } catch (e) { /* storage unavailable */ }
     }
 
+    function buttonsAll() {
+        return Array.prototype.slice.call(document.querySelectorAll('.view-toggle [data-view]'));
+    }
+
+    // Updates the layout attribute and every toggle on the page (they always agree).
     function apply(view) {
         root.dataset.postView = view;
-        buttons.forEach(function (button) {
+        buttonsAll().forEach(function (button) {
             button.setAttribute('aria-pressed', String(button.getAttribute('data-view') === view));
         });
     }
 
-    toggle.addEventListener('click', function (event) {
-        var button = event.target.closest('[data-view]');
-        if (!button || !toggle.contains(button)) return;
+    function makeToolbar(section) {
+        var bar = document.createElement('div');
+        bar.className = 'view-toolbar' + (section.inline ? ' view-toolbar--inline' : '');
+        bar.innerHTML =
+            '<div class="view-toggle" role="group" aria-label="' + section.label + '">' +
+            '<button type="button" class="view-toggle-btn" data-view="grid" aria-pressed="false" aria-label="Grid view" title="Grid view">' + ICON_GRID + '</button>' +
+            '<button type="button" class="view-toggle-btn" data-view="list" aria-pressed="false" aria-label="List view" title="List view">' + ICON_LIST + '</button>' +
+            '</div>';
+        return bar;
+    }
+
+    function mount() {
+        SECTIONS.forEach(function (section) {
+            var el = document.querySelector(section.selector);
+            if (!el) return;
+            if (section.addClass) el.classList.add(section.addClass);
+
+            if (section.where === 'before') {
+                // Keep a toolbar that is already in the page markup (index.html).
+                var prev = el.previousElementSibling;
+                if (prev && prev.classList.contains('view-toolbar')) return;
+                el.parentNode.insertBefore(makeToolbar(section), el);
+            } else {
+                if (el.querySelector(':scope > .view-toolbar')) return;
+                var heading = el.firstElementChild;
+                var bar = makeToolbar(section);
+                if (heading) heading.insertAdjacentElement('afterend', bar);
+                else el.insertBefore(bar, el.firstChild);
+            }
+        });
+    }
+
+    // One delegated listener serves every toggle, present or added later.
+    document.addEventListener('click', function (event) {
+        var button = event.target.closest && event.target.closest('.view-toggle [data-view]');
+        if (!button) return;
         var view = button.getAttribute('data-view');
         if (VIEWS.indexOf(view) === -1) return;
         apply(view);
@@ -59,5 +107,11 @@
     // pageshow also covers the back/forward cache, where scripts do not re-run.
     window.addEventListener('pageshow', function () { apply(readSaved()); });
 
-    apply(readSaved());
+    function init() {
+        mount();
+        apply(readSaved());
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
 })();

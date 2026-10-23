@@ -13,10 +13,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Jura:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/style.css?v=20261024b"><link rel="stylesheet" href="../assets/css/dark-felt.css?v=20261024b">
+    <link rel="stylesheet" href="../assets/css/style.css?v=20261024c"><link rel="stylesheet" href="../assets/css/dark-felt.css?v=20261024c">
     <link rel="manifest" href="../manifest.webmanifest">
     <script>(function () {var d = document.documentElement, t = 'dark'; try {if (localStorage.getItem('theme') === 'light') t = 'light';} catch (e) { } d.dataset.theme = t; d.classList.toggle('theme-light', t === 'light'); d.style.colorScheme = t; var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', t === 'light' ? '#f7f5f2' : '#05070a');})();</script>
-</head>
+<script>(function(){try{var v=localStorage.getItem('postView');if(v==='grid'||v==='list')document.documentElement.dataset.postView=v;}catch(e){}})();</script></head>
 
 <body>
     <script>document.body.classList.toggle('dark-theme', document.documentElement.dataset.theme !== 'light');</script>
@@ -204,7 +204,7 @@
                 </div>
             </div>
             <h1 class="category-header">Terminal</h1>
-            <div id="category-list">
+            <div id="category-list" class="posts-view">
                 <ul class="paginated-list" data-current-page="1" aria-live="polite">
                     <li class="paginated-item">
                         <div class="article_content">
@@ -357,7 +357,7 @@
     <script defer src="../assets/js/common.js"></script>
     <script defer src="../assets/js/pwa-install.js"></script>
     <script defer src="../assets/js/image-viewer.js"></script>
-    <script defer src="../assets/js/search.js"></script>
+    <script defer src="../assets/js/search.js"></script><script defer src="../assets/js/view-toggle.js"></script>
     <script defer src="../assets/js/subject.js"></script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-SJ97VTB0GY"></script>
     <script>window.dataLayer = window.dataLayer || []; function gtag() {dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-SJ97VTB0GY');</script>
