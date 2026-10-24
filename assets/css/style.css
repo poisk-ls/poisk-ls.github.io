@@ -266,7 +266,9 @@ input::-webkit-search-results-decoration {
 
 .sidebar-backdrop {
   position:fixed;
-  inset:0;
+  right:0;
+  bottom:0;
+  left:0;
   z-index:var(--stack-sidebar-backdrop);
   display:block;
   width:100%;
@@ -286,18 +288,24 @@ input::-webkit-search-results-decoration {
 
 .sidebar-drawer {
   position:fixed;
-  inset:var(--mobile-sidebar-header-height, var(--mobile-header-height)) auto 0 0;
+  top:var(--mobile-sidebar-header-height, var(--mobile-header-height));
+  right:auto;
+  bottom:0;
+  left:0;
   z-index:var(--stack-sidebar-drawer);
   display:flex;
   flex-direction:column;
-  width:min(90vw, 360px);
+  width:min(86vw, 320px);
   height:calc(100dvh - var(--mobile-sidebar-header-height, var(--mobile-header-height)));
   box-sizing:border-box;
   background:var(--color-surface);
   border-right:1px solid var(--color-border);
-  box-shadow:var(--shadow-md);
+  /* Closed: parked just past the left edge with no shadow, so nothing bleeds
+     onto the page. Opening slides it in from the left (see the open rule). */
+  box-shadow:none;
   transform:translateX(-102%);
-  transition:transform var(--motion-normal) ease;
+  transition:transform var(--motion-normal) ease,
+             box-shadow var(--motion-normal) ease;
   overscroll-behavior:contain;
 }
 
@@ -535,6 +543,7 @@ body.sidebar-drawer-open .sidebar-backdrop {
 
 body.sidebar-drawer-open .sidebar-drawer {
   transform:translateX(0);
+  box-shadow:var(--shadow-md);
 }
 
 @media (max-width:1024px) {
@@ -639,7 +648,10 @@ body.sidebar-drawer-open .sidebar-drawer {
   }
   .sidebar-drawer {
     position:relative;
-    inset:auto;
+    top:auto;
+    right:auto;
+    bottom:auto;
+    left:auto;
     z-index:auto;
     flex:1 1 auto;
     width:100%;
@@ -3667,16 +3679,7 @@ body .nav-list-expander:focus-visible {
     padding-bottom:calc(var(--action-size) + var(--mobile-floating-bottom) + var(--space-3));
   }
 
-  /* The menu button is on the right, so the drawer slides in from the right too. */
-  .sidebar-drawer {
-    left:auto;
-    right:0;
-    width:min(86vw, 320px);
-    padding-bottom:env(safe-area-inset-bottom, 0px);
-    border-right:0;
-    border-left:1px solid var(--color-border);
-    transform:translateX(102%);
-  }
+  .sidebar-drawer { padding-bottom:env(safe-area-inset-bottom, 0px); }
   .sidebar-drawer #navigation { padding:12px 10px 8px; }
 
   /* Touch-friendly rows with a real gap between them, so a highlighted row
@@ -3707,6 +3710,7 @@ body .nav-list-expander:focus-visible {
 
 @media (prefers-reduced-motion: reduce) {
   .site-action, .nav-list-link, .nav-list-expander { transition:none; }
+  .sidebar-drawer { transition:none; }
 }
 
 /* ==========================================================================

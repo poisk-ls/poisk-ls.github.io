@@ -264,10 +264,6 @@ body.dark-theme #btn-nav:hover,
 body.dark-theme #btn-nav:active,
 body.dark-theme #btn-nav[aria-expanded="true"] { background: #fff; color: #000; }
 body.dark-theme .sidebar-drawer { background: #000; border-right: 1px solid var(--felt-line-strong); }
-@media (max-width: 1024px) {
-  /* drawer slides in from the right (menu button is on the right) */
-  body.dark-theme .sidebar-drawer { border-right: 0; border-left: 1px solid var(--felt-line-strong); }
-}
 @media (min-width: 1025px) {
   body.dark-theme .sidebar-drawer { background: transparent; border: 0; }
 }
