@@ -19,7 +19,7 @@
    - activate: removes caches from older versions and takes control of open pages.
    Bump CACHE_VERSION whenever the file list or caching rules change.
    ========================================================================== */
-const CACHE_VERSION = 'site-v25';
+const CACHE_VERSION = 'site-v28';
 const CACHE = CACHE_VERSION + '-cache';
 const SCOPE = self.registration.scope; // always ends with "/"
 const SCOPE_PATH = new URL(SCOPE).pathname;
@@ -33,11 +33,13 @@ const FALLBACK_IMAGE = scoped('assets/img/thumbnail/empty.jpg');
 const SHELL = [
   'index.html', 'offline.html', '404.html', 'manifest.webmanifest',
   'assets/css/style.css', 'assets/css/dark-felt.css', 'assets/css/about-tabs.css', 'assets/css/highlight.min.css', 'assets/css/404.css',
-  'assets/js/common.js', 'assets/js/about-tabs.js', 'assets/js/search.js', 'assets/js/subject.js', 'assets/js/view-toggle.js',
+  'assets/js/file-compat.js', 'assets/js/offline-data.js', 'assets/js/common.js', 'assets/js/about-tabs.js', 'assets/js/search.js', 'assets/js/subject.js', 'assets/js/view-toggle.js',
   'assets/js/image-viewer.js', 'assets/js/pwa-install.js', 'assets/js/background.js',
   'assets/js/post.js', 'assets/js/404.js', 'assets/js/highlight.min.js',
   'assets/js/post/content.js', 'assets/js/post/scroll.js', 'assets/js/post/highlight.js',
   'assets/js/post/clipboard.js', 'assets/js/post/toc.js', 'assets/js/post/giscus.js', 'assets/js/post/analytics.js',
+  'assets/vendor/jura/jura.css', 'assets/vendor/fontawesome/css/all.min.css', 'assets/vendor/fontawesome/webfonts/fa-solid-900.woff2',
+  'assets/vendor/fontawesome/webfonts/fa-regular-400.woff2', 'assets/vendor/fontawesome/webfonts/fa-brands-400.woff2', 'assets/vendor/sweetalert2/sweetalert2.all.min.js',
   'assets/data/settings.json', 'assets/data/search-index.json', 'assets/data/posts.json',
   'assets/data/navigation.json', 'assets/data/site.json', 'assets/data/subjects.json', 'assets/data/themes.json',
   'assets/img/favicon.webp', 'assets/img/profile.webp', 'assets/img/loading.webp', 'assets/img/tile.webp',
@@ -45,11 +47,7 @@ const SHELL = [
 ].map(scoped);
 
 // Third-party files the pages load; cached best-effort (they may be unreachable).
-const EXTERNAL = [
-  'https://fonts.googleapis.com/css2?family=Jura:wght@300;400;500;600;700&display=swap',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css',
-  'https://cdn.jsdelivr.net/npm/sweetalert2@11'
-];
+const EXTERNAL = [];  // fonts, icons and SweetAlert2 are now self-hosted (assets/vendor)
 const EXTERNAL_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com', 'cdnjs.cloudflare.com', 'cdn.jsdelivr.net', 'readme-typing-svg.herokuapp.com'];
 
 /* ---------- helpers ---------- */

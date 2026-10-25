@@ -2,18 +2,16 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8"><script src="../assets/js/file-compat.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#05070a">
     <meta name="baseurl" content="">
     <meta name="description" content="Let me crash your reality!">
     <title>About</title>
     <link rel="shortcut icon" type="image/png" href="../assets/img/favicon.webp">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Jura:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/style.css?v=20261026a"><link rel="stylesheet" href="../assets/css/dark-felt.css?v=20261026a"><link rel="stylesheet" href="../assets/css/about-tabs.css?v=20261026a">
+    <link rel="stylesheet" href="../assets/vendor/jura/jura.css">
+    <link rel="stylesheet" href="../assets/vendor/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css?v=20261026d"><link rel="stylesheet" href="../assets/css/dark-felt.css?v=20261026d"><link rel="stylesheet" href="../assets/css/about-tabs.css?v=20261026d">
     <link rel="manifest" href="../manifest.webmanifest">
     <script>(function () {var d = document.documentElement, t = 'dark'; try {if (localStorage.getItem('theme') === 'light') t = 'light';} catch (e) { } d.dataset.theme = t; d.classList.toggle('theme-light', t === 'light'); d.style.colorScheme = t; var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', t === 'light' ? '#f7f5f2' : '#05070a');})();</script>
 <script>(function(){try{var v=localStorage.getItem('postView');if(v==='grid'||v==='list')document.documentElement.dataset.postView=v;}catch(e){}})();</script></head>
@@ -378,7 +376,7 @@
             <ul id="search-result"></ul>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../assets/vendor/sweetalert2/sweetalert2.all.min.js"></script>
     <script defer src="../assets/js/background.js"></script>
     <script defer src="../assets/js/common.js"></script>
     <script defer src="../assets/js/pwa-install.js"></script>
