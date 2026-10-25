@@ -19,7 +19,7 @@
    - activate: removes caches from older versions and takes control of open pages.
    Bump CACHE_VERSION whenever the file list or caching rules change.
    ========================================================================== */
-const CACHE_VERSION = 'site-v28';
+const CACHE_VERSION = 'site-v29';
 const CACHE = CACHE_VERSION + '-cache';
 const SCOPE = self.registration.scope; // always ends with "/"
 const SCOPE_PATH = new URL(SCOPE).pathname;
