@@ -326,18 +326,19 @@ body.dark-theme #post .inner-header {
   border-bottom: 1px solid var(--felt-line);
   border-radius: 0;
 }
+/* Dark theme dot tokens: brighter fills + a light hairline ring so they stay clear on the
+   near-black title bar. Sizing, shape and transition come from style.css. */
+body.dark-theme {
+  --dot-red: #FF6B63;
+  --dot-yellow: #FFC93C;
+  --dot-green: #34D655;
+  --dot-edge: rgba(0, 0, 0, .55);
+  --dot-ring: rgba(255, 255, 255, .28);
+}
 body.dark-theme .inner-header .dot {
-  /* Keep the inline red/yellow/green fills visible on the dark title bar. */
-  border: 1px solid rgba(0, 0, 0, .55);
-  border-radius: 50%;
   width: .8rem;
   height: .8rem;
-  opacity: 1;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, .18);
 }
-body.dark-theme .inner-header .dot:nth-child(1) { background-color: #F86158 !important; }
-body.dark-theme .inner-header .dot:nth-child(2) { background-color: #FBBF2D !important; }
-body.dark-theme .inner-header .dot:nth-child(3) { background-color: #2ACB45 !important; }
 
 body.dark-theme .category-tree p { color: var(--felt-muted); font-weight: 500; }
 body.dark-theme .category-tree p,

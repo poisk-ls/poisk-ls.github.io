@@ -163,3 +163,17 @@ body.dark-theme .about-tab[aria-selected="true"] {
   .about-tab { transition: none; }
   .about-panel { animation: none; }
 }
+
+/* ---------- 4. Resume photo: smaller on desktop only ----------
+   Width is capped and height follows the image's own ratio (height:auto), so it is
+   never cropped or stretched. Tablet / mobile (<=1024px) keep their existing layout. */
+@media (min-width: 1025px) {
+  #about-panel-resume p > img:only-child {
+    width: min(100%, 280px);
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+    display: block;
+    object-fit: contain;
+  }
+}

@@ -1311,12 +1311,37 @@ body.sidebar-drawer-open .sidebar-drawer {
   padding:8px 16px;
 }
 
+/* Window indicator dots (close / minimise / maximise).
+   Colors are theme tokens: Light values here, Dark values in dark-felt.css under
+   body.dark-theme. The theme switch only flips that class, so the dots re-color live
+   (no reload) and the transition below makes the change smooth. */
+:root {
+  --dot-red:#E0443E;
+  --dot-yellow:#E5A50A;
+  --dot-green:#1FA83A;
+  --dot-edge:rgba(0, 0, 0, .28);
+  --dot-ring:rgba(255, 255, 255, .65);
+}
+
 .inner-header .dot {
   height:1rem;
   width:1rem;
   margin:0 4px;
   border-radius:50%;
   display:inline-block;
+  box-sizing:border-box;
+  background-color:var(--dot-red);
+  border:1px solid var(--dot-edge);
+  box-shadow:0 0 0 1px var(--dot-ring);
+  transition:background-color .35s ease, border-color .35s ease, box-shadow .35s ease;
+}
+
+.inner-header .dot:nth-child(1) { background-color:var(--dot-red); }
+.inner-header .dot:nth-child(2) { background-color:var(--dot-yellow); }
+.inner-header .dot:nth-child(3) { background-color:var(--dot-green); }
+
+@media (prefers-reduced-motion: reduce) {
+  .inner-header .dot { transition:none; }
 }
 
 .inner-content {
