@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const POSTS_URL = S('/assets/data/posts.json');
     const INDEX_URL = S('/assets/data/search-index.json');
     const FALLBACK_IMAGE = S('/assets/img/thumbnail/empty.jpg');
+    const HOME_EXCLUDED = new Set(['/pages/about-whoami', '/pages/about-resume', '/pages/about-certificate']);
 
     // Only real list entries are paginated; the list is re-read after any
     // reconciliation so page counts always match what is in the DOM.
@@ -227,7 +228,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // this category. Returns null when the category cannot be identified.
     const resolveScope = async () => {
         const here = canonicalKey(location.href);
-        if (here === '/') return () => true;
+        // The About tabs (Whoami / Resume / Certificate | Exp) live only inside About,
+        // so they are not part of the All Posts list on Home.
+        if (here === '/') return post => !HOME_EXCLUDED.has(canonicalKey(post.url));
         const index = await fetchJson(INDEX_URL);
         const category = Array.isArray(index) ? index.find(entry => entry && entry.type === 'category' && canonicalKey(entry.url) === here) : null;
         if (!category) return null;
