@@ -24,7 +24,7 @@
                 // Arrived from another page (there is something real to go back to) -> go back.
                 // Typed URL, bookmark or stripped referrer -> fall back to the home page.
                 if (window.history.length > 1 && document.referrer) window.history.back();
-                else window.location.href = '/';
+                else window.location.href = (location.protocol === 'file:') ? new URL('index.html', document.baseURI).href : '/';
             });
         }
     }

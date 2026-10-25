@@ -1312,36 +1312,82 @@ body.sidebar-drawer-open .sidebar-drawer {
 }
 
 /* Window indicator dots (close / minimise / maximise).
-   Colors are theme tokens: Light values here, Dark values in dark-felt.css under
-   body.dark-theme. The theme switch only flips that class, so the dots re-color live
-   (no reload) and the transition below makes the change smooth. */
+   Modern aurora palette: pink -> violet -> teal (light) / pink -> violet -> aqua (dark).
+   Every color is a theme token: Light values here, Dark values in dark-felt.css under
+   body.dark-theme. Each dot has a base tone (--dot-N) and a lighter drift tone
+   (--dot-N-alt). An ::after layer in the drift tone fades in and out, so the dot moves
+   continuously between the two. Only `opacity` is animated (compositor-only, no layout
+   or paint per frame). Because the animation reads tokens, a theme switch re-colors the
+   dots live without restarting it, and the transitions below smooth that change.
+   Light tones are kept at or above 3:1 contrast against the pale title bar. */
 :root {
-  --dot-red:#E0443E;
-  --dot-yellow:#E5A50A;
-  --dot-green:#1FA83A;
-  --dot-edge:rgba(0, 0, 0, .28);
-  --dot-ring:rgba(255, 255, 255, .65);
+  --dot-1:#CC1F68;  --dot-1-alt:#E0357F;   /* rose pink */
+  --dot-2:#5645DC;  --dot-2-alt:#6A5AEA;   /* indigo violet */
+  --dot-3:#087A72;  --dot-3-alt:#0B8C83;   /* deep teal */
+  --dot-edge:rgba(0, 0, 0, .22);
+  --dot-ring:rgba(255, 255, 255, .7);
+  --dot-shine:rgba(255, 255, 255, .38);
+  --dot-cycle:3.6s;
 }
 
 .inner-header .dot {
+  position:relative;
   height:1rem;
   width:1rem;
   margin:0 4px;
   border-radius:50%;
   display:inline-block;
   box-sizing:border-box;
-  background-color:var(--dot-red);
+  background-color:var(--dot-1);
   border:1px solid var(--dot-edge);
   box-shadow:0 0 0 1px var(--dot-ring);
+  isolation:isolate;
   transition:background-color .35s ease, border-color .35s ease, box-shadow .35s ease;
 }
 
-.inner-header .dot:nth-child(1) { background-color:var(--dot-red); }
-.inner-header .dot:nth-child(2) { background-color:var(--dot-yellow); }
-.inner-header .dot:nth-child(3) { background-color:var(--dot-green); }
+/* Soft highlight for a glassy, modern look (static: not animated, theme-neutral). */
+.inner-header .dot::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:1;
+  border-radius:inherit;
+  background:radial-gradient(circle at 32% 28%, var(--dot-shine), transparent 62%);
+  pointer-events:none;
+  transition:background .35s ease;
+}
 
+.inner-header .dot::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  background-color:var(--dot-1-alt);
+  opacity:0;
+  pointer-events:none;
+  will-change:opacity;
+  transition:background-color .35s ease;
+  animation:dot-shift var(--dot-cycle) ease-in-out infinite;
+}
+
+.inner-header .dot:nth-child(1) { background-color:var(--dot-1); }
+.inner-header .dot:nth-child(2) { background-color:var(--dot-2); }
+.inner-header .dot:nth-child(3) { background-color:var(--dot-3); }
+.inner-header .dot:nth-child(1)::after { background-color:var(--dot-1-alt); }
+.inner-header .dot:nth-child(2)::after { background-color:var(--dot-2-alt); animation-delay:calc(var(--dot-cycle) / -3); }
+.inner-header .dot:nth-child(3)::after { background-color:var(--dot-3-alt); animation-delay:calc(var(--dot-cycle) / -1.5); }
+
+@keyframes dot-shift {
+  0%, 100% { opacity:0; }
+  50%      { opacity:1; }
+}
+
+/* Reduced motion: no animation, dots keep their static theme colors. */
 @media (prefers-reduced-motion: reduce) {
-  .inner-header .dot { transition:none; }
+  .inner-header .dot,
+  .inner-header .dot::before,
+  .inner-header .dot::after { transition:none; }
+  .inner-header .dot::after { animation:none; opacity:0; will-change:auto; }
 }
 
 .inner-content {
@@ -1660,8 +1706,8 @@ main .highlighter-rouge .highlight pre button {
 }
 
 main .highlighter-rouge .highlight pre button svg {
-  -webkit-mask-image:url('../img/icon/clipboard-regular.svg')
-  mask-image:url('../img/icon/clipboard-regular.svg')
+  -webkit-mask-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzODQgNTEyIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDYuNS4xIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjQgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZD0iTTI4MCA2NGg0MGMzNS4zIDAgNjQgMjguNyA2NCA2NFY0NDhjMCAzNS4zLTI4LjcgNjQtNjQgNjRINjRjLTM1LjMgMC02NC0yOC43LTY0LTY0VjEyOEMwIDkyLjcgMjguNyA2NCA2NCA2NGg0MCA5LjZDMTIxIDI3LjUgMTUzLjMgMCAxOTIgMHM3MSAyNy41IDc4LjQgNjRIMjgwek02NCAxMTJjLTguOCAwLTE2IDcuMi0xNiAxNlY0NDhjMCA4LjggNy4yIDE2IDE2IDE2SDMyMGM4LjggMCAxNi03LjIgMTYtMTZWMTI4YzAtOC44LTcuMi0xNi0xNi0xNkgzMDR2MjRjMCAxMy4zLTEwLjcgMjQtMjQgMjRIMTkyIDEwNGMtMTMuMyAwLTI0LTEwLjctMjQtMjRWMTEySDY0em0xMjgtOGEyNCAyNCAwIDEgMCAwLTQ4IDI0IDI0IDAgMSAwIDAgNDh6Ii8+PC9zdmc+")
+  mask-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzODQgNTEyIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDYuNS4xIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjQgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZD0iTTI4MCA2NGg0MGMzNS4zIDAgNjQgMjguNyA2NCA2NFY0NDhjMCAzNS4zLTI4LjcgNjQtNjQgNjRINjRjLTM1LjMgMC02NC0yOC43LTY0LTY0VjEyOEMwIDkyLjcgMjguNyA2NCA2NCA2NGg0MCA5LjZDMTIxIDI3LjUgMTUzLjMgMCAxOTIgMHM3MSAyNy41IDc4LjQgNjRIMjgwek02NCAxMTJjLTguOCAwLTE2IDcuMi0xNiAxNlY0NDhjMCA4LjggNy4yIDE2IDE2IDE2SDMyMGM4LjggMCAxNi03LjIgMTYtMTZWMTI4YzAtOC44LTcuMi0xNi0xNi0xNkgzMDR2MjRjMCAxMy4zLTEwLjcgMjQtMjQgMjRIMTkyIDEwNGMtMTMuMyAwLTI0LTEwLjctMjQtMjRWMTEySDY0em0xMjgtOGEyNCAyNCAwIDEgMCAwLTQ4IDI0IDI0IDAgMSAwIDAgNDh6Ii8+PC9zdmc+")
   background-color:#555 !important;
   mask-repeat:no-repeat;
   mask-position:center;
@@ -2361,23 +2407,23 @@ and
 
 .result-item table .ico-book {
   background-color:dodgerblue !important;
-  -webkit-mask-image:url('../img/icon/book-solid.svg')
-  mask-image:url('../img/icon/book-solid.svg')
+  -webkit-mask-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDYuNS4xIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjQgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZD0iTTk2IDBDNDMgMCAwIDQzIDAgOTZWNDE2YzAgNTMgNDMgOTYgOTYgOTZIMzg0aDMyYzE3LjcgMCAzMi0xNC4zIDMyLTMycy0xNC4zLTMyLTMyLTMyVjM4NGMxNy43IDAgMzItMTQuMyAzMi0zMlYzMmMwLTE3LjctMTQuMy0zMi0zMi0zMkgzODQgOTZ6bTAgMzg0SDM1MnY2NEg5NmMtMTcuNyAwLTMyLTE0LjMtMzItMzJzMTQuMy0zMiAzMi0zMnptMzItMjQwYzAtOC44IDcuMi0xNiAxNi0xNkgzMzZjOC44IDAgMTYgNy4yIDE2IDE2cy03LjIgMTYtMTYgMTZIMTQ0Yy04LjggMC0xNi03LjItMTYtMTZ6bTE2IDQ4SDMzNmM4LjggMCAxNiA3LjIgMTYgMTZzLTcuMiAxNi0xNiAxNkgxNDRjLTguOCAwLTE2LTcuMi0xNi0xNnM3LjItMTYgMTYtMTZ6Ii8+PC9zdmc+")
+  mask-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDYuNS4xIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjQgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZD0iTTk2IDBDNDMgMCAwIDQzIDAgOTZWNDE2YzAgNTMgNDMgOTYgOTYgOTZIMzg0aDMyYzE3LjcgMCAzMi0xNC4zIDMyLTMycy0xNC4zLTMyLTMyLTMyVjM4NGMxNy43IDAgMzItMTQuMyAzMi0zMlYzMmMwLTE3LjctMTQuMy0zMi0zMi0zMkgzODQgOTZ6bTAgMzg0SDM1MnY2NEg5NmMtMTcuNyAwLTMyLTE0LjMtMzItMzJzMTQuMy0zMiAzMi0zMnptMzItMjQwYzAtOC44IDcuMi0xNiAxNi0xNkgzMzZjOC44IDAgMTYgNy4yIDE2IDE2cy03LjIgMTYtMTYgMTZIMTQ0Yy04LjggMC0xNi03LjItMTYtMTZ6bTE2IDQ4SDMzNmM4LjggMCAxNiA3LjIgMTYgMTZzLTcuMiAxNi0xNiAxNkgxNDRjLTguOCAwLTE2LTcuMi0xNi0xNnM3LjItMTYgMTYtMTZ6Ii8+PC9zdmc+")
 }
 
 .result-item table .ico-folder {
-  -webkit-mask-image:url('../img/icon/folder-open-regular.svg')
-  mask-image:url('../img/icon/folder-open-regular.svg')
+  -webkit-mask-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1NzYgNTEyIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDYuNS4xIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjQgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZD0iTTM4NCA0ODBoNDhjMTEuNCAwIDIxLjktNiAyNy42LTE1LjlsMTEyLTE5MmM1LjgtOS45IDUuOC0yMi4xIC4xLTMyLjFTNTU1LjUgMjI0IDU0NCAyMjRIMTQ0Yy0xMS40IDAtMjEuOSA2LTI3LjYgMTUuOUw0OCAzNTcuMVY5NmMwLTguOCA3LjItMTYgMTYtMTZIMTgxLjVjNC4yIDAgOC4zIDEuNyAxMS4zIDQuN2wyNi41IDI2LjVjMjEgMjEgNDkuNSAzMi44IDc5LjIgMzIuOEg0MTZjOC44IDAgMTYgNy4yIDE2IDE2djMyaDQ4VjE2MGMwLTM1LjMtMjguNy02NC02NC02NEgyOTguNWMtMTcgMC0zMy4zLTYuNy00NS4zLTE4LjdMMjI2LjcgNTAuN2MtMTItMTItMjguMy0xOC43LTQ1LjMtMTguN0g2NEMyOC43IDMyIDAgNjAuNyAwIDk2VjQxNmMwIDM1LjMgMjguNyA2NCA2NCA2NEg4Ny43IDM4NHoiLz48L3N2Zz4=")
+  mask-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1NzYgNTEyIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDYuNS4xIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjQgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZD0iTTM4NCA0ODBoNDhjMTEuNCAwIDIxLjktNiAyNy42LTE1LjlsMTEyLTE5MmM1LjgtOS45IDUuOC0yMi4xIC4xLTMyLjFTNTU1LjUgMjI0IDU0NCAyMjRIMTQ0Yy0xMS40IDAtMjEuOSA2LTI3LjYgMTUuOUw0OCAzNTcuMVY5NmMwLTguOCA3LjItMTYgMTYtMTZIMTgxLjVjNC4yIDAgOC4zIDEuNyAxMS4zIDQuN2wyNi41IDI2LjVjMjEgMjEgNDkuNSAzMi44IDc5LjIgMzIuOEg0MTZjOC44IDAgMTYgNy4yIDE2IDE2djMyaDQ4VjE2MGMwLTM1LjMtMjguNy02NC02NC02NEgyOTguNWMtMTcgMC0zMy4zLTYuNy00NS4zLTE4LjdMMjI2LjcgNTAuN2MtMTItMTItMjguMy0xOC43LTQ1LjMtMTguN0g2NEMyOC43IDMyIDAgNjAuNyAwIDk2VjQxNmMwIDM1LjMgMjguNyA2NCA2NCA2NEg4Ny43IDM4NHoiLz48L3N2Zz4=")
 }
 
 .result-item table .ico-tags {
-  -webkit-mask-image:url('../img/icon/tags-solid.svg')
-  mask-image:url('../img/icon/tags-solid.svg')
+  -webkit-mask-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDYuNS4xIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjQgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZD0iTTM0NSAzOS4xTDQ3Mi44IDE2OC40YzUyLjQgNTMgNTIuNCAxMzguMiAwIDE5MS4yTDM2MC44IDQ3Mi45Yy05LjMgOS40LTI0LjUgOS41LTMzLjkgLjJzLTkuNS0yNC41LS4yLTMzLjlMNDM4LjYgMzI1LjljMzMuOS0zNC4zIDMzLjktODkuNCAwLTEyMy43TDMxMC45IDcyLjljLTkuMy05LjQtOS4yLTI0LjYgLjItMzMuOXMyNC42LTkuMiAzMy45IC4yek0wIDIyOS41VjgwQzAgNTMuNSAyMS41IDMyIDQ4IDMySDE5Ny41YzE3IDAgMzMuMyA2LjcgNDUuMyAxOC43bDE2OCAxNjhjMjUgMjUgMjUgNjUuNSAwIDkwLjVMMjc3LjMgNDQyLjdjLTI1IDI1LTY1LjUgMjUtOTAuNSAwbC0xNjgtMTY4QzYuNyAyNjIuNyAwIDI0Ni41IDAgMjI5LjV6TTE0NCAxNDRhMzIgMzIgMCAxIDAgLTY0IDAgMzIgMzIgMCAxIDAgNjQgMHoiLz48L3N2Zz4=")
+  mask-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDYuNS4xIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjQgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZD0iTTM0NSAzOS4xTDQ3Mi44IDE2OC40YzUyLjQgNTMgNTIuNCAxMzguMiAwIDE5MS4yTDM2MC44IDQ3Mi45Yy05LjMgOS40LTI0LjUgOS41LTMzLjkgLjJzLTkuNS0yNC41LS4yLTMzLjlMNDM4LjYgMzI1LjljMzMuOS0zNC4zIDMzLjktODkuNCAwLTEyMy43TDMxMC45IDcyLjljLTkuMy05LjQtOS4yLTI0LjYgLjItMzMuOXMyNC42LTkuMiAzMy45IC4yek0wIDIyOS41VjgwQzAgNTMuNSAyMS41IDMyIDQ4IDMySDE5Ny41YzE3IDAgMzMuMyA2LjcgNDUuMyAxOC43bDE2OCAxNjhjMjUgMjUgMjUgNjUuNSAwIDkwLjVMMjc3LjMgNDQyLjdjLTI1IDI1LTY1LjUgMjUtOTAuNSAwbC0xNjgtMTY4QzYuNyAyNjIuNyAwIDI0Ni41IDAgMjI5LjV6TTE0NCAxNDRhMzIgMzIgMCAxIDAgLTY0IDAgMzIgMzIgMCAxIDAgNjQgMHoiLz48L3N2Zz4=")
 }
 
 .result-item table .ico-calendar {
-  -webkit-mask-image:url('../img/icon/calendar-days-regular.svg')
-  mask-image:url('../img/icon/calendar-days-regular.svg')
+  -webkit-mask-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDYuNS4xIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjQgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZD0iTTE1MiAyNGMwLTEzLjMtMTAuNy0yNC0yNC0yNHMtMjQgMTAuNy0yNCAyNFY2NEg2NEMyOC43IDY0IDAgOTIuNyAwIDEyOHYxNiA0OFY0NDhjMCAzNS4zIDI4LjcgNjQgNjQgNjRIMzg0YzM1LjMgMCA2NC0yOC43IDY0LTY0VjE5MiAxNDQgMTI4YzAtMzUuMy0yOC43LTY0LTY0LTY0SDM0NFYyNGMwLTEzLjMtMTAuNy0yNC0yNC0yNHMtMjQgMTAuNy0yNCAyNFY2NEgxNTJWMjR6TTQ4IDE5Mmg4MHY1Nkg0OFYxOTJ6bTAgMTA0aDgwdjY0SDQ4VjI5NnptMTI4IDBoOTZ2NjRIMTc2VjI5NnptMTQ0IDBoODB2NjRIMzIwVjI5NnptODAtNDhIMzIwVjE5Mmg4MHY1NnptMCAxNjB2NDBjMCA4LjgtNy4yIDE2LTE2IDE2SDMyMFY0MDhoODB6bS0xMjggMHY1NkgxNzZWNDA4aDk2em0tMTQ0IDB2NTZINjRjLTguOCAwLTE2LTcuMi0xNi0xNlY0MDhoODB6TTI3MiAyNDhIMTc2VjE5Mmg5NnY1NnoiLz48L3N2Zz4=")
+  mask-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDYuNS4xIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjQgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZD0iTTE1MiAyNGMwLTEzLjMtMTAuNy0yNC0yNC0yNHMtMjQgMTAuNy0yNCAyNFY2NEg2NEMyOC43IDY0IDAgOTIuNyAwIDEyOHYxNiA0OFY0NDhjMCAzNS4zIDI4LjcgNjQgNjQgNjRIMzg0YzM1LjMgMCA2NC0yOC43IDY0LTY0VjE5MiAxNDQgMTI4YzAtMzUuMy0yOC43LTY0LTY0LTY0SDM0NFYyNGMwLTEzLjMtMTAuNy0yNC0yNC0yNHMtMjQgMTAuNy0yNCAyNFY2NEgxNTJWMjR6TTQ4IDE5Mmg4MHY1Nkg0OFYxOTJ6bTAgMTA0aDgwdjY0SDQ4VjI5NnptMTI4IDBoOTZ2NjRIMTc2VjI5NnptMTQ0IDBoODB2NjRIMzIwVjI5NnptODAtNDhIMzIwVjE5Mmg4MHY1NnptMCAxNjB2NDBjMCA4LjgtNy4yIDE2LTE2IDE2SDMyMFY0MDhoODB6bS0xMjggMHY1NkgxNzZWNDA4aDk2em0tMTQ0IDB2NTZINjRjLTguOCAwLTE2LTcuMi0xNi0xNlY0MDhoODB6TTI3MiAyNDhIMTc2VjE5Mmg5NnY1NnoiLz48L3N2Zz4=")
 }
 
 .result-item table .ico-book,
