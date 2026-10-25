@@ -246,7 +246,7 @@
     <script defer src="../assets/js/post.js"></script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-SJ97VTB0GY"></script>
     <script>window.dataLayer = window.dataLayer || []; function gtag() {dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-SJ97VTB0GY');</script>
-    <script>if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('../service-worker.js').catch(() => { }), {once: true});</script>
+    <script>if('serviceWorker' in navigator)window.addEventListener('load',function(){var had=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener('controllerchange',function(){if(had&&!window.__swReloaded){window.__swReloaded=1;location.reload();}});navigator.serviceWorker.register('../service-worker.js',{updateViaCache:'none'}).then(function(r){return r.update();}).catch(function(){});},{once:true});</script>
 </body>
 
 </html>

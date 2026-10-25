@@ -13,13 +13,18 @@
    - Pages are stored under one canonical key (see pageKey), so "/pages/about",
      "/pages/about.html", "/pages/about/" and "?page=2" variants all hit the same entry.
    - fetch: pages are network-first (fresh online, cached offline, offline.html as the
-     last resort, so the browser never shows ERR_FILE_NOT_FOUND); data and CSS are
-     network-first; scripts and images are stale-while-revalidate; every handler has an
+     last resort, so the browser never shows ERR_FILE_NOT_FOUND); data, CSS and
+     scripts are network-first; images are stale-while-revalidate; every handler has an
      offline fallback.
+   - Freshness: every same-origin request is sent with cache:'no-cache', so the browser
+     revalidates with the server instead of trusting GitHub Pages' 10-minute HTTP cache.
+     A change you deploy is therefore visible on the next load, not "eventually".
    - activate: removes caches from older versions and takes control of open pages.
-   Bump CACHE_VERSION whenever the file list or caching rules change.
+   CACHE_VERSION is stamped with the commit SHA by the deploy workflow
+   (tools/stamp-version.js), so every deployment installs a fresh worker and cache.
+   Bump it by hand only if you deploy without the workflow.
    ========================================================================== */
-const CACHE_VERSION = 'site-v29';
+const CACHE_VERSION = 'site-v30'; // stamped per deploy: tools/stamp-version.js
 const CACHE = CACHE_VERSION + '-cache';
 const SCOPE = self.registration.scope; // always ends with "/"
 const SCOPE_PATH = new URL(SCOPE).pathname;
@@ -77,6 +82,16 @@ function withTimeout(promise, ms) {
 
 async function putPage(cache, url, response) {
   await cache.put(new Request(pageKey(url)), await clean(response));
+}
+
+// Always revalidate with the server (bypasses the browser's HTTP cache, which GitHub Pages
+// fills with max-age=600). Same-origin only; third parties keep their own caching.
+const revalidate = request => fetch(request, { cache: 'no-cache' });
+
+// Store a response, dropping older copies of the same file that differ only by ?v=.
+async function store(cache, request, response) {
+  try { await cache.delete(request, { ignoreSearch: true }); } catch (_) { /* ignore */ }
+  await cache.put(request, response);
 }
 
 // Look a request up ignoring ?v= / ?page= style query strings.
@@ -213,7 +228,7 @@ self.addEventListener('message', event => {
 async function handleNavigation(request) {
   const cache = await caches.open(CACHE);
   try {
-    const response = await withTimeout(fetch(request), NETWORK_TIMEOUT);
+    const response = await withTimeout(fetch(request.url, { cache: 'no-cache', credentials: 'same-origin' }), NETWORK_TIMEOUT);
     if (response && response.ok && response.type === 'basic') {
       // Only cache real pages, not the server's 404 page or redirects to other sites.
       cache.put(new Request(pageKey(request.url)), (await clean(response.clone()))).catch(() => {});
@@ -234,8 +249,8 @@ async function handleNavigation(request) {
 async function networkFirst(request) {
   const cache = await caches.open(CACHE);
   try {
-    const response = await withTimeout(fetch(request), NETWORK_TIMEOUT);
-    if (response && response.ok) cache.put(request, response.clone()).catch(() => {});
+    const response = await withTimeout(revalidate(request), NETWORK_TIMEOUT);
+    if (response && response.ok) store(cache, request, response.clone()).catch(() => {});
     return response;
   } catch (_) {
     const cached = await lookup(request);
@@ -247,8 +262,9 @@ async function networkFirst(request) {
 async function staleWhileRevalidate(request, event) {
   const cache = await caches.open(CACHE);
   const cached = await lookup(request);
-  const refresh = fetch(request).then(response => {
-    if (response && (response.ok || response.type === 'opaque')) cache.put(request, response.clone()).catch(() => {});
+  const sameOrigin = new URL(request.url).origin === self.location.origin;
+  const refresh = (sameOrigin ? revalidate(request) : fetch(request)).then(response => {
+    if (response && (response.ok || response.type === 'opaque')) store(cache, request, response.clone()).catch(() => {});
     return response;
   }).catch(() => null);
   if (cached) { event.waitUntil(refresh); return cached; }
@@ -260,34 +276,6 @@ async function staleWhileRevalidate(request, event) {
   }
   return new Response('', { status: 504, statusText: 'Offline' });
 }
-
-/* ---------- freshness override (added) ----------
-   Why edits did not show after a refresh: every fetch(request) above goes through the
-   browser's HTTP cache, and GitHub Pages serves every file with "Cache-Control: max-age=600".
-   So even the "network-first" handlers were handed the stale copy for up to 10 minutes, and
-   scripts/images (stale-while-revalidate) were answered from cache first. This listener is
-   registered BEFORE the handler below and re-issues same-origin pages, CSS, JS, JSON and
-   images with cache:'no-cache' (revalidate with the server; unchanged files cost a tiny 304),
-   reusing the existing network-first helpers for timeout + offline fallback. Fonts and all
-   third-party requests are left to the original handler. */
-self.addEventListener('fetch', event => {
-  const request = event.request;
-  if (request.method !== 'GET') return;
-  const url = new URL(request.url);
-  if (!/^https?:$/.test(url.protocol) || url.origin !== self.location.origin) return;
-  if (/\.(?:woff2?|ttf)$/i.test(url.pathname)) return;
-
-  const isPage = request.mode === 'navigate';
-  if (!isPage && !isStaticAsset(url.href)) return;
-
-  const revalidate = new Request(request, { cache: 'no-cache' });
-  const isImage = request.destination === 'image';
-  event.respondWith(isPage ? handleNavigation(revalidate) : networkFirst(revalidate).then(async response => {
-    if (isImage && response.status === 504) { const fallback = await lookup(FALLBACK_IMAGE); if (fallback) return fallback; }
-    return response;
-  }));
-  event.stopImmediatePropagation(); // keep the original handler below from also responding
-});
 
 self.addEventListener('fetch', event => {
   const request = event.request;
@@ -305,8 +293,10 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Content data and stylesheets: network-first so edits show up, cache when offline.
-  if (/\/assets\/data\/[^/]+\.json$/i.test(url.pathname) || /\.css$/i.test(url.pathname)) {
+  // Content data, stylesheets and scripts: network-first so edits show up immediately,
+  // cache only when offline. (Scripts used to be stale-while-revalidate, which served the
+  // OLD script on the first load after every deploy.)
+  if (/\/assets\/data\/[^/]+\.json$/i.test(url.pathname) || /\.(?:css|js|webmanifest)$/i.test(url.pathname)) {
     event.respondWith(networkFirst(request));
     return;
   }
