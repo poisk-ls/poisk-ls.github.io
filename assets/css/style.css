@@ -4649,3 +4649,67 @@ html[data-post-view="list"] #category-list.posts-view .article_content .txt_post
 @media (min-width:769px) {
   #related-box #related-posts { grid-template-columns:repeat(3, minmax(0, 1fr)); gap:2rem 1.5rem; }
 }
+
+/* ==========================================================================
+   Navigation states — one token-driven layer for Light and Dark.
+   Every part of a nav row (label, icon, chevron) INHERITS the row's colour, so
+   a hover / focus / pressed / current state can never leave text or icons
+   sitting on a background they can't be read against. Dark values are set in
+   dark-felt.css by overriding the --nav-* tokens only.
+   Contrast (Light): rest 10.9:1, hover 12.9:1, current 6.9:1 on tinted bg.
+   ========================================================================== */
+#navigation {
+  --nav-fg:#3a241a;
+  --nav-fg-muted:#5c4a54;
+  --nav-bg-hover:#efe3d9;
+  --nav-fg-hover:#24150f;
+  --nav-bg-current:#f6dccb;
+  --nav-fg-current:#7a2c04;
+  --nav-indicator:var(--color-accent);
+}
+
+#navigation .nav-list-link,
+#navigation .nav-list-expander {
+  color:var(--nav-fg);
+}
+#navigation .nav-list-expander { color:var(--nav-fg-muted); }
+
+/* children always follow the row colour (beats global span/i/svg colour rules) */
+#navigation .nav-item .nav-tree-label,
+#navigation .nav-item .nav-tree-icon,
+#navigation .nav-item .nav-list-expander i,
+#navigation .nav-item .nav-list-expander svg {
+  color:inherit;
+}
+#navigation .nav-item .nav-tree-icon svg,
+#navigation .nav-item .nav-list-expander svg {
+  fill:currentColor;
+}
+
+#navigation .nav-tree-node.is-current > .nav-item > .nav-list-link,
+#navigation .nav-tree-node.is-current > .nav-item > .nav-list-expander {
+  background:var(--nav-bg-current);
+  color:var(--nav-fg-current);
+}
+#navigation .nav-tree-node.is-current > .nav-item > .nav-list-link {
+  box-shadow:inset 3px 0 0 var(--nav-indicator);
+}
+
+@media (hover:hover) and (pointer:fine) {
+  #navigation .nav-list-link:hover,
+  #navigation .nav-list-expander:hover,
+  #navigation .nav-tree-node.is-current > .nav-item > .nav-list-link:hover,
+  #navigation .nav-tree-node.is-current > .nav-item > .nav-list-expander:hover {
+    background:var(--nav-bg-hover);
+    color:var(--nav-fg-hover);
+  }
+}
+#navigation .nav-list-link:focus-visible,
+#navigation .nav-list-expander:focus-visible,
+#navigation .nav-list-link:active,
+#navigation .nav-list-expander:active,
+#navigation .nav-tree-node.is-current > .nav-item > .nav-list-link:active,
+#navigation .nav-tree-node.is-current > .nav-item > .nav-list-expander:active {
+  background:var(--nav-bg-hover);
+  color:var(--nav-fg-hover);
+}

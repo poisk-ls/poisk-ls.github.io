@@ -231,6 +231,19 @@ body.dark-theme .nav-list-link:active,
 body.dark-theme .nav-list-expander:active { background: #fff; color: #000; }
 body.dark-theme .nav-list-link:active .nav-tree-label { color: #000; }
 
+/* Nav state tokens for Dark. The shared state layer lives at the end of style.css
+   (#navigation .nav-list-link …); only the colours are set here, so label, icon and
+   chevron all invert together (white on black rest → black on white hover/pressed). */
+body.dark-theme #navigation {
+  --nav-fg: var(--felt-muted);        /* #9a9a9a on #000 ≈ 7.6:1 */
+  --nav-fg-muted: var(--felt-muted);
+  --nav-bg-hover: #fff;
+  --nav-fg-hover: #000;               /* 21:1 */
+  --nav-bg-current: #111;
+  --nav-fg-current: #fff;             /* ≈ 18:1 */
+  --nav-indicator: #fff;
+}
+
 /* contact + copyright */
 body.dark-theme #contact hr { background: var(--felt-line); border-color: var(--felt-line); }
 body.dark-theme #contact .contact-list li a {
