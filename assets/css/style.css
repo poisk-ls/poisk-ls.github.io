@@ -1312,18 +1312,18 @@ body.sidebar-drawer-open .sidebar-drawer {
 }
 
 /* Window indicator dots (close / minimise / maximise).
-   Modern aurora palette: pink -> violet -> teal (light) / pink -> violet -> aqua (dark).
-   Every color is a theme token: Light values here, Dark values in dark-felt.css under
-   body.dark-theme. Each dot has a base tone (--dot-N) and a lighter drift tone
-   (--dot-N-alt). An ::after layer in the drift tone fades in and out, so the dot moves
-   continuously between the two. Only `opacity` is animated (compositor-only, no layout
-   or paint per frame). Because the animation reads tokens, a theme switch re-colors the
-   dots live without restarting it, and the transitions below smooth that change.
-   Light tones are kept at or above 3:1 contrast against the pale title bar. */
+   Light mode keeps the original red / yellow / green. Dark mode switches to a modern
+   pink / violet / aqua set (defined in dark-felt.css under body.dark-theme).
+   Every color is a theme token: Light values here, Dark values in dark-felt.css. Each dot
+   has a base tone (--dot-N) and a lighter drift tone (--dot-N-alt). An ::after layer in
+   the drift tone fades in and out, so the dot moves continuously between the two. Only
+   `opacity` is animated (compositor-only, no layout or paint per frame). Because the
+   animation reads tokens, a theme switch re-colors the dots live without restarting it,
+   and the transitions below smooth that change. */
 :root {
-  --dot-1:#CC1F68;  --dot-1-alt:#E0357F;   /* rose pink */
-  --dot-2:#5645DC;  --dot-2-alt:#6A5AEA;   /* indigo violet */
-  --dot-3:#087A72;  --dot-3-alt:#0B8C83;   /* deep teal */
+  --dot-1:#F86158;  --dot-1-alt:#FF8A80;   /* original red */
+  --dot-2:#FBBF2D;  --dot-2-alt:#FFD65C;   /* original yellow */
+  --dot-3:#2ACB45;  --dot-3-alt:#5EDD76;   /* original green */
   --dot-edge:rgba(0, 0, 0, .22);
   --dot-ring:rgba(255, 255, 255, .7);
   --dot-shine:rgba(255, 255, 255, .38);
