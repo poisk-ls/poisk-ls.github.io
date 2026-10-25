@@ -32,8 +32,8 @@ const FALLBACK_IMAGE = scoped('assets/img/thumbnail/empty.jpg');
 // Files every page needs. Anything else is discovered from the pages and data.
 const SHELL = [
   'index.html', 'offline.html', '404.html', 'manifest.webmanifest',
-  'assets/css/style.css', 'assets/css/dark-felt.css', 'assets/css/highlight.min.css', 'assets/css/404.css',
-  'assets/js/common.js', 'assets/js/search.js', 'assets/js/subject.js', 'assets/js/view-toggle.js',
+  'assets/css/style.css', 'assets/css/dark-felt.css', 'assets/css/about-tabs.css', 'assets/css/highlight.min.css', 'assets/css/404.css',
+  'assets/js/common.js', 'assets/js/about-tabs.js', 'assets/js/search.js', 'assets/js/subject.js', 'assets/js/view-toggle.js',
   'assets/js/image-viewer.js', 'assets/js/pwa-install.js', 'assets/js/background.js',
   'assets/js/post.js', 'assets/js/404.js', 'assets/js/highlight.min.js',
   'assets/js/post/content.js', 'assets/js/post/scroll.js', 'assets/js/post/highlight.js',

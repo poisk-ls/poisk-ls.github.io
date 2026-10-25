@@ -1,0 +1,166 @@
+/* ==========================================================================
+   about-tabs.css  —  tab interface for the About page (pages/about.html)
+
+   SCOPE
+   - Additive layer, loaded AFTER style.css and dark-felt.css. Neither file is edited.
+   - Only pages/about.html links this file, so no other page can be affected.
+   - Colors, radii, motion and focus all come from the existing design tokens
+     (--color-*, --radius-sm, --motion-*), so Light and Dark (felt) themes follow the
+     theme switch automatically, including a live toggle with no reload.
+   - Progressive enhancement: the tab block stays hidden until about-tabs.js adds
+     .about-tabs-on to .inner-content. Without JavaScript the original post list,
+     view toggle and pagination show exactly as before.
+   ========================================================================== */
+
+/* ---------- 1. Hand-over: tabs replace the post list once JS is running ---------- */
+.about-tabs { display: none; }
+
+.about-tabs-on .about-tabs { display: block; }
+.about-tabs-on .view-toolbar,
+.about-tabs-on #category-list,
+.about-tabs-on .pagination { display: none; }
+
+/* ---------- 2. Tab bar ---------- */
+.about-tabs {
+  --about-tab-ink: #fff;                 /* text on the active (accent) tab */
+  margin: 0 8px;
+  /* keeps the bar clear of the fixed mobile header when scrolled into view */
+  scroll-margin-top: calc(var(--mobile-header-height, 58px) + 12px);
+}
+body.dark-theme .about-tabs { --about-tab-ink: #000; }
+
+.about-tablist {
+  display: grid;
+  grid-auto-flow: column;
+  /* equal columns when they fit; scroll sideways (never wrap or overflow) on very narrow screens */
+  grid-auto-columns: minmax(max-content, 1fr);
+  gap: 4px;
+  padding: 4px;
+  margin: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  background: var(--color-surface-muted, #f1ebe5);
+  border: 1px solid var(--color-border, rgba(58, 36, 26, .14));
+  border-radius: var(--radius-md, 12px);
+}
+.about-tablist::-webkit-scrollbar { display: none; }
+
+.about-tab {
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+  min-width: 0;
+  min-height: 44px;                      /* comfortable touch target */
+  padding: 0 clamp(6px, 2vw, 18px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  font-family: var(--font-jura, 'Jura', sans-serif);
+  font-size: clamp(.62rem, 2.9vw, .875rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted, #66545e);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm, 8px);
+  box-shadow: inset 0 0 0 1px transparent;
+  transition: background-color var(--motion-fast, 140ms) ease,
+              color var(--motion-fast, 140ms) ease,
+              box-shadow var(--motion-fast, 140ms) ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+@media (hover: hover) {
+  .about-tab:not([aria-selected="true"]):hover {
+    color: var(--color-text-strong, #24150f);
+    background: var(--color-surface-hover, #f4eee8);
+    box-shadow: inset 0 0 0 1px var(--color-border, rgba(58, 36, 26, .14));
+  }
+}
+
+.about-tab[aria-selected="true"] {
+  color: var(--about-tab-ink);
+  background: var(--color-accent, #b04008);
+  box-shadow: inset 0 0 0 1px var(--color-accent, #b04008);
+  cursor: default;
+}
+
+.about-tab:focus { outline: none; }
+.about-tab:focus-visible {
+  outline: 2px solid var(--color-focus, #2563eb);
+  outline-offset: 2px;
+}
+
+/* Dark (felt) theme: sharp corners, hairline rings, inverted active state,
+   matching the pagination controls. */
+body.dark-theme .about-tablist {
+  background: transparent;
+  border-color: var(--felt-line-strong, rgba(255, 255, 255, .18));
+  border-radius: 0;
+}
+body.dark-theme .about-tab { border-radius: 0; letter-spacing: .08em; }
+body.dark-theme .about-tab[aria-selected="true"] {
+  background: #fff;
+  color: #000;
+  box-shadow: inset 0 0 0 1px #fff;
+}
+
+/* ---------- 3. Panels ---------- */
+/* The panels live inside a single <main>, so every existing content style
+   (headings, blockquotes, lists, rules, links) applies exactly as on the sub-pages. */
+.about-panels {
+  /* A floor on the height keeps the page from collapsing (and the scrollbar from
+     appearing/disappearing) when switching from a long tab to a short one. */
+  min-height: clamp(18rem, 55vh, 40rem);
+  margin-top: 12px;
+}
+
+.about-panel[hidden] { display: none; }
+
+.about-panel {
+  animation: about-tab-in .22s ease both;   /* opacity only: nothing moves */
+}
+
+/* Remove the tall top gap the sub-page headings carry (they sat under a banner there). */
+.about-panels .about-panel > :first-child { margin-top: .5rem; }
+
+/* Panel content must never push the page wider than the viewport. */
+.about-panel { min-width: 0; max-width: 100%; }
+.about-panel img { max-width: 100%; }
+.about-panel iframe { display: block; max-width: 100%; }
+
+.about-panel:focus { outline: none; }
+.about-panel:focus-visible {
+  outline: 2px solid var(--color-focus, #2563eb);
+  outline-offset: 4px;
+}
+
+@keyframes about-tab-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Same side margins as the "About" heading above it (8px; 2rem from tablet up). */
+@media (min-width: 769px) {
+  .about-tabs { margin: 0 2rem; }
+}
+
+@media (max-width: 480px) {
+  .about-tablist { gap: 2px; padding: 3px; }
+  .about-tab { letter-spacing: .03em; }
+  body.dark-theme .about-tab { letter-spacing: .04em; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-tab { transition: none; }
+  .about-panel { animation: none; }
+}
