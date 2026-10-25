@@ -261,6 +261,34 @@ async function staleWhileRevalidate(request, event) {
   return new Response('', { status: 504, statusText: 'Offline' });
 }
 
+/* ---------- freshness override (added) ----------
+   Why edits did not show after a refresh: every fetch(request) above goes through the
+   browser's HTTP cache, and GitHub Pages serves every file with "Cache-Control: max-age=600".
+   So even the "network-first" handlers were handed the stale copy for up to 10 minutes, and
+   scripts/images (stale-while-revalidate) were answered from cache first. This listener is
+   registered BEFORE the handler below and re-issues same-origin pages, CSS, JS, JSON and
+   images with cache:'no-cache' (revalidate with the server; unchanged files cost a tiny 304),
+   reusing the existing network-first helpers for timeout + offline fallback. Fonts and all
+   third-party requests are left to the original handler. */
+self.addEventListener('fetch', event => {
+  const request = event.request;
+  if (request.method !== 'GET') return;
+  const url = new URL(request.url);
+  if (!/^https?:$/.test(url.protocol) || url.origin !== self.location.origin) return;
+  if (/\.(?:woff2?|ttf)$/i.test(url.pathname)) return;
+
+  const isPage = request.mode === 'navigate';
+  if (!isPage && !isStaticAsset(url.href)) return;
+
+  const revalidate = new Request(request, { cache: 'no-cache' });
+  const isImage = request.destination === 'image';
+  event.respondWith(isPage ? handleNavigation(revalidate) : networkFirst(revalidate).then(async response => {
+    if (isImage && response.status === 504) { const fallback = await lookup(FALLBACK_IMAGE); if (fallback) return fallback; }
+    return response;
+  }));
+  event.stopImmediatePropagation(); // keep the original handler below from also responding
+});
+
 self.addEventListener('fetch', event => {
   const request = event.request;
   if (request.method !== 'GET') return;
