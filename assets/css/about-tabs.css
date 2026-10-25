@@ -31,9 +31,8 @@ body.dark-theme .about-tabs { --about-tab-ink: #000; }
 
 .about-tablist {
   display: grid;
-  grid-auto-flow: column;
-  /* equal columns when they fit; scroll sideways (never wrap or overflow) on very narrow screens */
-  grid-auto-columns: minmax(max-content, 1fr);
+  /* the combined tab gets a little more room; labels may wrap on very narrow screens */
+  grid-template-columns: 1.5fr 1fr 1fr;
   gap: 4px;
   padding: 4px;
   margin: 0;
@@ -58,12 +57,12 @@ body.dark-theme .about-tabs { --about-tab-ink: #000; }
   align-items: center;
   justify-content: center;
   text-align: center;
-  white-space: nowrap;
+  white-space: normal;
   cursor: pointer;
   font-family: var(--font-jura, 'Jura', sans-serif);
   font-size: clamp(.62rem, 2.9vw, .875rem);
   font-weight: 600;
-  line-height: 1;
+  line-height: 1.2;
   letter-spacing: .06em;
   text-transform: uppercase;
   color: var(--color-text-muted, #66545e);

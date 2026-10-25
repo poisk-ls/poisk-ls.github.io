@@ -4,7 +4,7 @@
    - Loaded synchronously right after the tab markup, so the tab view is in place
      before the first paint (no flash of the old post list, no flash of the wrong tab).
    - Pure show/hide of already-present panels: no fetches, no reloads, no layout jumps.
-   - Deep links: about#certificate, about#exp, about#resume, about#whoami. The hash is
+   - Deep links: about#certificate (also #exp), about#resume, about#whoami. The hash is
      kept in sync with history.replaceState (no scroll jump, no extra history entries),
      and back/forward or a manually edited hash switch tabs too.
    - Keyboard (WAI-ARIA tabs pattern): Left/Right (wrapping), Home, End.
@@ -28,7 +28,7 @@
     var DEFAULT_TAB = tabs[0].getAttribute('data-tab');
     var ALIASES = {
         certification: 'certificate', certificates: 'certificate', cert: 'certificate',
-        experience: 'exp',
+        exp: 'certificate', experience: 'certificate',
         cv: 'resume',
         whoam: 'whoami', 'whoam-i': 'whoami'
     };
