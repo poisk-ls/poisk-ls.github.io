@@ -32,7 +32,7 @@ body.dark-theme .about-tabs { --about-tab-ink: #000; }
 .about-tablist {
   display: grid;
   /* the combined tab gets a little more room; labels may wrap on very narrow screens */
-  grid-template-columns: 1.5fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1.5fr;
   gap: 4px;
   padding: 4px;
   margin: 0;

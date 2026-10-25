@@ -8,27 +8,7 @@
     "label": "About",
     "url": "/pages/about",
     "icon": "folder",
-    "order": 2,
-    "children": [
-      {
-        "label": "Certificate | Exp",
-        "url": "/pages/about-certificate",
-        "icon": "document",
-        "order": 1
-      },
-      {
-        "label": "Resume",
-        "url": "/pages/about-resume",
-        "icon": "document",
-        "order": 2
-      },
-      {
-        "label": "WHOAM—Ī",
-        "url": "/pages/about-whoami",
-        "icon": "document",
-        "order": 3
-      }
-    ]
+    "order": 2
   },
   {
     "label": "Terminal",
