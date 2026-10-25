@@ -1,305 +1,391 @@
-/* ==========================================================================
-   Service worker: full offline support after the first online visit.
+<!doctype html>
+<html lang="en">
 
-   How it works
-   - Everything is resolved against the worker's own scope (self.registration.scope),
-     never a hardcoded "/", so it works at the domain root, in a sub-folder, and on
-     localhost alike.
-   - install: pre-caches the app shell, then reads search-index.json and posts.json
-     and pre-caches EVERY page and thumbnail listed there. Each cached HTML page is
-     scanned for the CSS / JS / image files it references, and each cached CSS file for
-     its url(...) assets, so nothing the pages need is left out. Third-party CSS, fonts
-     and scripts (Google Fonts, Font Awesome, SweetAlert) are cached best-effort.
-   - Pages are stored under one canonical key (see pageKey), so "/pages/about",
-     "/pages/about.html", "/pages/about/" and "?page=2" variants all hit the same entry.
-   - fetch: pages are network-first (fresh online, cached offline, offline.html as the
-     last resort, so the browser never shows ERR_FILE_NOT_FOUND); data, CSS and
-     scripts are network-first; images are stale-while-revalidate; every handler has an
-     offline fallback.
-   - Freshness: every same-origin request is sent with cache:'no-cache', so the browser
-     revalidates with the server instead of trusting GitHub Pages' 10-minute HTTP cache.
-     A change you deploy is therefore visible on the next load, not "eventually".
-   - activate: removes caches from older versions and takes control of open pages.
-   CACHE_VERSION is stamped with the commit SHA by the deploy workflow
-   (tools/stamp-version.js), so every deployment installs a fresh worker and cache.
-   Bump it by hand only if you deploy without the workflow.
-   ========================================================================== */
-const CACHE_VERSION = 'site-v30'; // stamped per deploy: tools/stamp-version.js
-const CACHE = CACHE_VERSION + '-cache';
-const SCOPE = self.registration.scope; // always ends with "/"
-const SCOPE_PATH = new URL(SCOPE).pathname;
-const NETWORK_TIMEOUT = 6000;
+<head>
+    <meta charset="utf-8"><script src="../assets/js/file-compat.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#05070a">
+    <meta name="baseurl" content="">
+    <meta name="description" content="Let me crash your reality!">
+    <title>About</title>
+    <link rel="shortcut icon" type="image/png" href="../assets/img/favicon.webp">
+    <link rel="stylesheet" href="../assets/vendor/jura/jura.css">
+    <link rel="stylesheet" href="../assets/vendor/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css?v=20261026f"><link rel="stylesheet" href="../assets/css/dark-felt.css?v=20261026f"><link rel="stylesheet" href="../assets/css/about-tabs.css?v=20261026f">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <script>(function () {var d = document.documentElement, t = 'dark'; try {if (localStorage.getItem('theme') === 'light') t = 'light';} catch (e) { } d.dataset.theme = t; d.classList.toggle('theme-light', t === 'light'); d.style.colorScheme = t; var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', t === 'light' ? '#f7f5f2' : '#05070a');})();</script>
+<script>(function(){try{var v=localStorage.getItem('postView');if(v==='grid'||v==='list')document.documentElement.dataset.postView=v;}catch(e){}})();</script></head>
 
-const scoped = path => new URL(String(path).replace(/^\/+/, ''), SCOPE).href;
-const OFFLINE_URL = scoped('offline.html');
-const FALLBACK_IMAGE = scoped('assets/img/thumbnail/empty.jpg');
+<body>
+    <script>document.body.classList.toggle('dark-theme', document.documentElement.dataset.theme !== 'light');</script>
+    <canvas id="stars" aria-hidden="true"></canvas>
+    <aside class="sidebar sidebar-left" id="site-sidebar">
+        <header class="side-banner">
+            <div class="sidebar-brand"><a href="../index" class="site-name" aria-label="ρԾɿՏƙ-ʅՏ home"><img class="site-logo"
+                        src="../assets/img/profile.webp" alt="" width="36" height="36"
+                        decoding="async"><mark>ρԾɿՏƙ-ʅՏ</mark></a></div><a href="../index" class="site-avatar"
+                aria-label="Open profile"><img src="../assets/img/profile.webp" loading="lazy" decoding="async" width="64"
+                    height="64" alt="Profile"></a><button id="btn-nav" class="btn-nav" type="button"
+                aria-controls="sidebar-drawer" aria-expanded="false" aria-label="Open navigation menu"><span
+                    class="btn-nav-icon" aria-hidden="true">☰</span></button>
+        </header>
+        <button class="sidebar-backdrop" type="button" data-sidebar-close aria-label="Close navigation menu"></button>
+        <div class="sidebar-drawer" id="sidebar-drawer" tabindex="-1">
+            <div class="side-info">
+                <nav id="navigation" aria-label="Site navigation">
+                    <ul class="nav-tree">
+                        <li class="nav-tree-node nav-tree-level-1" data-depth="1" data-nav-key="/">
+                            <div class="nav-item"><a href="../index" class="nav-list-link nav-sh" data-nav-url="/"><span
+                                        class="nav-tree-label">Root</span></a></div>
+                        </li>
+                        <li class="nav-tree-node nav-tree-level-1" data-depth="1" data-nav-key="/pages/about">
+                            <div class="nav-item"><a href="../pages/about" class="nav-list-link nav-sh"
+                                    data-nav-url="/pages/about"><span
+                                        class="nav-tree-label">About</span></a></div>
+                            
+                        </li>
+                        <li class="nav-tree-node nav-tree-level-1" data-depth="1" data-nav-key="/pages/terminal">
+                            <div class="nav-item"><a href="../pages/terminal" class="nav-list-link nav-sh"
+                                    data-nav-url="/pages/terminal"><span
+                                        class="nav-tree-label">Terminal</span></a><button type="button"
+                                    class="nav-list-expander" aria-label="Expand Terminal" aria-expanded="false"
+                                    aria-controls="nav-2"><i class="fa-solid fa-chevron-down"
+                                        aria-hidden="true"></i></button></div>
+                            <ul class="nav-tree-children" id="nav-2">
+                                <li class="nav-tree-node nav-tree-level-2" data-depth="2"
+                                    data-nav-key="/pages/terminal-cmd">
+                                    <div class="nav-item"><a href="../pages/terminal-cmd"
+                                            class="nav-list-link nav-sh" data-nav-url="/pages/terminal-cmd"><span
+                                                class="nav-tree-label">CMD</span></a><button type="button"
+                                            class="nav-list-expander" aria-label="Expand CMD" aria-expanded="false"
+                                            aria-controls="nav-2-0"><i class="fa-solid fa-chevron-down"
+                                                aria-hidden="true"></i></button></div>
+                                    <ul class="nav-tree-children" id="nav-2-0">
+                                        <li class="nav-tree-node nav-tree-level-3" data-depth="3"
+                                            data-nav-key="/pages/terminal-cmd-post-01-jadecmd">
+                                            <div class="nav-item"><a href="../pages/terminal-cmd-post-01-jadecmd"
+                                                    class="nav-list-link nav-sh"
+                                                    data-nav-url="/pages/terminal-cmd-post-01-jadecmd"><span
+                                                        class="nav-tree-label">Jade-CMD</span></a></div>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="nav-tree-node nav-tree-level-2" data-depth="2"
+                                    data-nav-key="/pages/terminal-repo">
+                                    <div class="nav-item"><a href="../pages/terminal-repo"
+                                            class="nav-list-link nav-sh" data-nav-url="/pages/terminal-repo"><span
+                                                class="nav-tree-label">Repo</span></a><button type="button"
+                                            class="nav-list-expander" aria-label="Expand Repo" aria-expanded="false"
+                                            aria-controls="nav-2-1"><i class="fa-solid fa-chevron-down"
+                                                aria-hidden="true"></i></button></div>
+                                    <ul class="nav-tree-children" id="nav-2-1">
+                                        <li class="nav-tree-node nav-tree-level-3" data-depth="3"
+                                            data-nav-key="/pages/terminal-repo-post-01-poisk-ai">
+                                            <div class="nav-item"><a href="../pages/terminal-repo-post-01-poisk-ai"
+                                                    class="nav-list-link nav-sh"
+                                                    data-nav-url="/pages/terminal-repo-post-01-poisk-ai"><span
+                                                        class="nav-tree-label">Poisk-AI</span></a></div>
+                                        </li>
+                                        <li class="nav-tree-node nav-tree-level-3" data-depth="3"
+                                            data-nav-key="/pages/terminal-repo-post-02-bms">
+                                            <div class="nav-item"><a href="../pages/terminal-repo-post-02-bms"
+                                                    class="nav-list-link nav-sh"
+                                                    data-nav-url="/pages/terminal-repo-post-02-bms"><span
+                                                        class="nav-tree-label">Best-Modded-Site</span></a></div>
+                                        </li>
+                                        <li class="nav-tree-node nav-tree-level-3" data-depth="3"
+                                            data-nav-key="/pages/terminal-repo-post-03-mod-ap">
+                                            <div class="nav-item"><a href="../pages/terminal-repo-post-03-mod-ap"
+                                                    class="nav-list-link nav-sh"
+                                                    data-nav-url="/pages/terminal-repo-post-03-mod-ap"><span
+                                                        class="nav-tree-label">My Game/Apps Collection</span></a></div>
+                                        </li>
+                                        <li class="nav-tree-node nav-tree-level-3" data-depth="3"
+                                            data-nav-key="/pages/terminal-repo-post-04-wv">
+                                            <div class="nav-item"><a href="../pages/terminal-repo-post-04-wv"
+                                                    class="nav-list-link nav-sh"
+                                                    data-nav-url="/pages/terminal-repo-post-04-wv"><span
+                                                        class="nav-tree-label">Welcome Voice</span></a></div>
+                                        </li>
+                                        <li class="nav-tree-node nav-tree-level-3" data-depth="3"
+                                            data-nav-key="/pages/terminal-repo-post-05-dbt">
+                                            <div class="nav-item"><a href="../pages/terminal-repo-post-05-dbt"
+                                                    class="nav-list-link nav-sh"
+                                                    data-nav-url="/pages/terminal-repo-post-05-dbt"><span
+                                                        class="nav-tree-label">Database on Terminal</span></a></div>
+                                        </li>
+                                        <li class="nav-tree-node nav-tree-level-3" data-depth="3"
+                                            data-nav-key="/pages/terminal-repo-post-06-afhs">
+                                            <div class="nav-item"><a href="../pages/terminal-repo-post-06-afhs"
+                                                    class="nav-list-link nav-sh"
+                                                    data-nav-url="/pages/terminal-repo-post-06-afhs"><span
+                                                        class="nav-tree-label">Awesome File Hosting Services</span></a>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+                <div id="contact">
+                    <hr>
+                    <h3>Contact</h3>
+                    <ul class="contact-list">
+                        <li><a aria-label="My GitHub" href="https://github.com/poisk-ls"><i class="fa-brands fa-github"
+                                    aria-hidden="true"></i></a></li>
+                        <li><a aria-label="My X" href="https://twitter.com/poiskls"><i class="fa-brands fa-x-twitter"
+                                    aria-hidden="true"></i></a></li>
+                        <li><a aria-label="My Instagram" href="https://www.instagram.com/jadepoiskls"><i
+                                    class="fa-brands fa-instagram" aria-hidden="true"></i></a></li>
+                        <li><a aria-label="My Facebook" href="https://www.facebook.com/poisk-ls"><i
+                                    class="fa-brands fa-facebook" aria-hidden="true"></i></a></li>
+                        <li><a aria-label="My LinkedIn" href="https://www.linkedin.com/in/poisk-ls"><i
+                                    class="fa-brands fa-linkedin" aria-hidden="true"></i></a></li>
+                        <li><a aria-label="My Discord" href="https://discord.com/users/1115921763348525087"><i
+                                    class="fa-brands fa-discord" aria-hidden="true"></i></a></li>
+                        <li><a aria-label="My Bluesky" href="https://bsky.app/profile/poisk-ls.bsky.social"><i
+                                    class="fa-brands fa-bluesky" aria-hidden="true"></i></a></li>
+                        <li><a aria-label="My Email" href="mailto:jadepoisk@gmail.com"><i class="fa-solid fa-envelope"
+                                    aria-hidden="true"></i></a></li>
+                    </ul>
+                    <hr><span>© 2025 | <a href="https://github.com/poisk-ls">poisk-ls</a></span>
+                </div>
+            </div>
+        </div>
+    </aside>
+    <div class="site-actions" role="toolbar" aria-label="Search and theme"><button type="button"
+            class="site-action btn-search" aria-label="Search" title="Search"><span class="site-action-icon"
+                aria-hidden="true"><i class="fa-solid fa-magnifying-glass"></i></span></button><button type="button"
+            class="site-action btn-brightness" aria-label="Toggle theme" title="Theme"><span class="site-action-icon"
+                aria-hidden="true"><i class="fa-solid fa-moon ico-dark"></i><i
+                    class="fa-solid fa-sun ico-light"></i></span></button></div>
+    <div class="sidebar sidebar-right">
+        <div class="toc"><span class="toc-header"><i class="fa-solid fa-bookmark" aria-hidden="true"></i>
+                Contents</span>
+            <div class="toc-board"></div>
+        </div>
+    </div>
+    <div id="post">
+        <div class="inner-header"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+        <div class="inner-content">
+            <div class="category-tree">
+                <p><a href="../index">Home</a> &gt; About</p>
+            </div>
+            <div id="loading">
+                <div class="loading_box"><img src="../assets/img/loading.webp" alt="Loading" width="135" height="135">
+                    <p>please wait ...</p>
+                </div>
+            </div>
+            <h1 class="category-header">About</h1>
+            <section class="about-tabs" id="about-tabs" aria-label="About sections">
+                <div class="about-tablist" role="tablist" aria-label="About">
+                    <button type="button" role="tab" class="about-tab" id="about-tab-whoami" data-tab="whoami" aria-controls="about-panel-whoami" aria-selected="true" tabindex="0">Whoami</button>
+                    <button type="button" role="tab" class="about-tab" id="about-tab-resume" data-tab="resume" aria-controls="about-panel-resume" aria-selected="false" tabindex="-1">Resume</button>
+                    <button type="button" role="tab" class="about-tab" id="about-tab-certificate" data-tab="certificate" aria-controls="about-panel-certificate" aria-selected="false" tabindex="-1">Certificate | Exp</button>
+                </div>
+                <main class="about-panels">
+                    <section class="about-panel" id="about-panel-whoami" role="tabpanel" aria-labelledby="about-tab-whoami" tabindex="0">
+                        <img class="whoami-image" src="../assets/img/poisk-ls.webp" alt="Jade Nelson N. Buhayan" title="poisk-ls" loading="lazy" decoding="async" width="945" height="1436">
 
-// Files every page needs. Anything else is discovered from the pages and data.
-const SHELL = [
-  'index.html', 'offline.html', '404.html', 'manifest.webmanifest',
-  'assets/css/style.css', 'assets/css/dark-felt.css', 'assets/css/about-tabs.css', 'assets/css/highlight.min.css', 'assets/css/404.css',
-  'assets/js/file-compat.js', 'assets/js/offline-data.js', 'assets/js/common.js', 'assets/js/about-tabs.js', 'assets/js/search.js', 'assets/js/subject.js', 'assets/js/view-toggle.js',
-  'assets/js/image-viewer.js', 'assets/js/pwa-install.js', 'assets/js/background.js',
-  'assets/js/post.js', 'assets/js/404.js', 'assets/js/highlight.min.js',
-  'assets/js/post/content.js', 'assets/js/post/scroll.js', 'assets/js/post/highlight.js',
-  'assets/js/post/clipboard.js', 'assets/js/post/toc.js', 'assets/js/post/giscus.js', 'assets/js/post/analytics.js',
-  'assets/vendor/jura/jura.css', 'assets/vendor/fontawesome/css/all.min.css', 'assets/vendor/fontawesome/webfonts/fa-solid-900.woff2',
-  'assets/vendor/fontawesome/webfonts/fa-regular-400.woff2', 'assets/vendor/fontawesome/webfonts/fa-brands-400.woff2', 'assets/vendor/sweetalert2/sweetalert2.all.min.js',
-  'assets/data/settings.json', 'assets/data/search-index.json', 'assets/data/posts.json',
-  'assets/data/navigation.json', 'assets/data/site.json', 'assets/data/subjects.json', 'assets/data/themes.json',
-  'assets/img/favicon.webp', 'assets/img/profile.webp', 'assets/img/loading.webp', 'assets/img/tile.webp',
-  'assets/img/pwa/icon-192.webp', 'assets/img/pwa/icon-512.webp', 'assets/img/thumbnail/empty.jpg'
-].map(scoped);
+                        <h1>Hello there! ^_^</h1>
+                        <h2>I'm Jade Nelson N. Buhayan</h2>
+                        <ul>
+                        <li><p>I’m someone who values consistency, growth, and staying grounded in every step I take. I’ve always believed that showing up with purpose matters more than making noise. I stay calm under pressure, listen more than I speak, and work best when I’m focused on a goal with a clear path forward.</p>
+                        </li>
+                        <li><p>I have a natural curiosity for technology and a deep respect for process, precision, and learning. Whether it's diving into software systems, supporting a team, or simply figuring out the most efficient way to solve a problem—I do it with patience and care.</p>
+                        </li>
+                        <li><p>My strength lies in reliability. I value trust, both giving and earning it, and I take pride in being someone people can count on. Every task I take on, I handle with attention to detail and a commitment to doing it right.</p>
+                        </li>
+                        <li><p>I’m here not just to work—I’m here to grow, contribute, and move forward with integrity.</p>
+                        </li>
+                        </ul>
+                        <p>Here's the list of my site!🫰🏿</p>
+                        <blockquote>
+                        <p><a href="https://poisk-ls.blogspot.com">poisk-ls</a> / <a href="https://poisklss.blogspot.com">poisklss</a> / <a href="https://jadepoiskls.blogspot.com">jadepoiskls</a></p>
+                        </blockquote>
+                    </section>
+                    <section class="about-panel" id="about-panel-resume" role="tabpanel" aria-labelledby="about-tab-resume" tabindex="0" hidden>
+                        <h1>Jade Nelson N. Buhayan</h1>
+                        <hr />
+                        <p><img src="../assets/img/profile.webp?width=100&amp;height=100" alt="Jade Nelson N. Buhayan" /></p>
+                        <h2>GET IN TOUCH</h2>
+                        <p><strong>Phone:</strong> <a href="tel:09052877252">+63 905-2877-252</a><br>
+                        <strong>Mail me at:</strong> <a href="mailto:buhayanjadenelsonn@gmail.com">buhayanjade@gmail.com</a><br>
+                        <a href="https://linkedin.com/in/poisk-ls">linked</a> / <a href="https://github.com/poisk-ls">Github</a></p>
+                        <hr />
+                        <h2>OBJECTIVES</h2>
+                        <p>To secure a position in a reputable organization where I can effectively contribute my skills, knowledge, and abilities while demonstrating my commitment and strong work ethic. I aim to grow professionally and contribute to the organization’s success through dedication and continuous development.</p>
+                        <hr />
+                        <h2>TECHNICAL SKILLS</h2>
+                        <ul>
+                        <li>Basic understanding of Linux command</li>
+                        <li>Windows/MS Office Activation Tools , Databases</li>
+                        <li>Software Installation and Configuration</li>
+                        <li>Experience with MS Word and Excel</li>
+                        <li>Basic Coding Skills</li>
+                        <li>Operating Systems Installation</li>
+                        <li>Experience with cloud-like MediaFire, Google Drive, US, Dropden, etc.</li>
+                        <li>Understanding of Data Backup and Recovery</li>
+                        </ul>
+                        <hr />
+                        <h2>PERSONAL SKILLS</h2>
+                        <ul>
+                        <li>Capable of organizing data</li>
+                        <li>Patient and understanding</li>
+                        <li>Excellent interpersonal skills</li>
+                        <li>Ability to work collaboratively</li>
+                        <li>Trustworthy in handling sensitive and confidential information</li>
+                        <li>Willing to learn and adapt to new tools and processes as needed</li>
+                        <li>Reliable and consistent in completing tasks and showing up on time</li>
+                        </ul>
+                        <hr />
+                        <h2>EXPERIENCE</h2>
+                        <p><strong>Fast Services Corporation</strong>
+                        <em>2year &amp; 4mos — Present</em></p>
+                        <ul>
+                        <li>Responsible for picking items accurately according to orders</li>
+                        <li>Provided support to the Outbound Encoder Department during the peak season in December</li>
+                        <li>Voluntarily contributed to managing the increased workload</li>
+                        <li>Demonstrated flexibility, initiative, and a strong team-oriented mindset</li>
+                        </ul>
+                        <hr />
+                        <h2>CERTIFICATION</h2>
+                        <ul>
+                        <li><strong>Feb 05, 2022 - Jan 01, 2023</strong>: TESDA CONTACT CENTER SERVICES NC II</li>
+                        <li>Perfect Attendance Award - Recognized for consistent punctuality and reliability, maintaining perfect attendance and demonstrating strong work ethic and dedication</li>
+                        </ul>
+                        <hr />
+                        <h2>EDUCATION</h2>
+                        <p><strong>2023 - 2024</strong>
+                        <strong>Bachelor of Science in Information Technology</strong>
+                        <em>Madrilejos Community College</em>
+                        Bunakan, Madridejos Cebu</p>
+                        <hr />
+                        <h2>LANGUAGES</h2>
+                        <ul>
+                        <li>English ★★☆☆☆</li>
+                        <li>Tagalog ★★★☆☆</li>
+                        <li>Bisaya  ★★★★★</li>
+                        </ul>
+                        <p><a href="https://drive.google.com/uc?export=download&id=1fV0oIeOCzsKZvoH_iJ15QBPGoPzA_dLE" 
+                           download 
+                           style="display: inline-block; margin-bottom: 12px; padding: 10px 18px; background: #007BFF; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">
+                        ⬇️ Download Resume PDF
+                        </a></p>
+                        <iframe data-src="https://drive.google.com/file/d/1fV0oIeOCzsKZvoH_iJ15QBPGoPzA_dLE/preview" title="Resume PDF preview" loading="lazy" 
+                          style="border: none; width: 800px; max-width: 100%; height: 600px; max-height: 100%; border-radius: 8px;" 
+                          allowfullscreen>
+                        </iframe>
+                    </section>
+                    <section class="about-panel" id="about-panel-certificate" role="tabpanel" aria-labelledby="about-tab-certificate" tabindex="0" hidden>
+                        <h1>My Certification &amp; Exp</h1>
+                        <blockquote>
+                        <p>🏷️ Participation on Database</p>
+                        </blockquote>
+                        <blockquote>
+                        <p>🏷️ Tesda Training NCII — Call Center</p>
+                        </blockquote>
+                        <blockquote>
+                        <p>🏷️ Maintaining Perfect Attendace @FSC</p>
+                        </blockquote>
+                        <blockquote>
+                        <p>🏷️ IT intern — Maintain Grading System</p>
+                        </blockquote>
+                        <blockquote>
+                        <p>🏷️ Outbound Encoder</p>
+                        </blockquote>
+                    </section>
+                </main>
+            </section>
+            <script src="../assets/js/about-tabs.js?v=20261025a"></script>
+            <div id="category-list" class="posts-view">
+                <ul class="paginated-list" data-current-page="1" aria-live="polite">
+                    <li class="paginated-item">
+                        <div class="article_content">
+                            <div class="thumbnail_zone"><a href="../pages/about-resume" class="thumbnail_post"
+                                    aria-label="Resume"><img src="../assets/img/res.png" alt="Resume thumbnail"
+                                        loading="lazy" decoding="async" width="800" height="480"></a></div>
+                            <div class="box_contents"><a href="../pages/about-resume">
+                                    <h1 class="title_post">Resume</h1>
+                                </a><a href="../pages/about-resume" class="txt_post">Jade Nelson N. Buhayan GET IN
+                                    TOUCH Phone: +63 905-2877-252 Mail me at: buhayanjade@gmail.com linked / Github
+                                    OBJECTIVES To secure a position in a reputable organization where I can effectively
+                                    contribute my skills, knowledge, and abilities while demonstrating my commitment and
+                                    strong work ethic. I aim to grow professi</a>
+                                <div class="info-post"><span class="category">About</span><span class="date">·
+                                        2025-05-02</span></div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="paginated-item">
+                        <div class="article_content">
+                            <div class="thumbnail_zone"><a href="../pages/about-certificate" class="thumbnail_post"
+                                    aria-label="Certificate | Exp"><img src="../assets/img/cert.webp"
+                                        alt="Certificate | Exp thumbnail" loading="lazy" decoding="async" width="800"
+                                        height="480"></a></div>
+                            <div class="box_contents"><a href="../pages/about-certificate">
+                                    <h1 class="title_post">Certificate | Exp</h1>
+                                </a><a href="../pages/about-certificate" class="txt_post">My Certification &amp; Exp
+                                    🏷️ Participation on Database 🏷️ Tesda Training NCII — Call Center 🏷️ Maintaining
+                                    Perfect Attendace @FSC 🏷️ IT intern — Maintain Grading System 🏷️ Outbound
+                                    Encoder</a>
+                                <div class="info-post"><span class="category">About</span><span class="date">·
+                                        2025-05-01</span></div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="paginated-item">
+                        <div class="article_content">
+                            <div class="thumbnail_zone"><a href="../pages/about-whoami" class="thumbnail_post"
+                                    aria-label="WHOAM—Ī"><img src="../assets/img/poisk-ls-avatar.webp"
+                                        alt="WHOAM—Ī thumbnail" loading="lazy" decoding="async" width="800"
+                                        height="480"></a></div>
+                            <div class="box_contents"><a href="../pages/about-whoami">
+                                    <h1 class="title_post">WHOAM—Ī</h1>
+                                </a><a href="../pages/about-whoami" class="txt_post">Hello there! ^_^ I&#x27;m Jade
+                                    Nelson N. Buhayan I’m someone who values consistency, growth, and staying grounded
+                                    in every step I take. I’ve always believed that showing up with purpose matters more
+                                    than making noise. I stay calm under pressure, listen more than I speak, and work
+                                    best when I’m focused on a goal with a clear</a>
+                                <div class="info-post"><span class="category">About</span><span class="date">·
+                                        2025-05-01</span></div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="pagination">
+                <nav class="pagination-container"><button type="button" class="pagination-button" id="prev-button"
+                        aria-label="Previous page" title="Previous page">&lt;</button>
+                    <div id="pagination-numbers"></div><button type="button" class="pagination-button" id="next-button"
+                        aria-label="Next page" title="Next page">&gt;</button>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <div id="search" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Site search">
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="search-box"><mark>Touch background to close</mark>
+            <div class="input-box"><label class="sr-only" for="search-input">Search site</label><input id="search-input"
+                    type="search" tabindex="1" spellcheck="false" placeholder="Search..." /><button id="btn-clear"
+                    type="button" aria-label="Clear search"><i class="fa-solid fa-xmark"
+                        aria-hidden="true"></i></button></div>
+            <ul id="search-result"></ul>
+        </div>
+    </div>
+    <script src="../assets/vendor/sweetalert2/sweetalert2.all.min.js"></script>
+    <script defer src="../assets/js/background.js"></script>
+    <script defer src="../assets/js/common.js"></script>
+    <script defer src="../assets/js/pwa-install.js"></script>
+    <script defer src="../assets/js/image-viewer.js"></script>
+    <script defer src="../assets/js/search.js"></script><script defer src="../assets/js/view-toggle.js"></script>
+    <script defer src="../assets/js/subject.js"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SJ97VTB0GY"></script>
+    <script>window.dataLayer = window.dataLayer || []; function gtag() {dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-SJ97VTB0GY');</script>
+    <script>if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('../service-worker.js').catch(() => { }), {once: true});</script>
+</body>
 
-// Third-party files the pages load; cached best-effort (they may be unreachable).
-const EXTERNAL = [];  // fonts, icons and SweetAlert2 are now self-hosted (assets/vendor)
-const EXTERNAL_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com', 'cdnjs.cloudflare.com', 'cdn.jsdelivr.net', 'readme-typing-svg.herokuapp.com'];
-
-/* ---------- helpers ---------- */
-
-// Canonical cache key for a page: no query/hash, no ".html", no "/index", no trailing slash.
-function pageKey(input) {
-  const u = new URL(input, SCOPE);
-  let p = u.pathname.replace(/\/index(?:\.html)?$/i, '/').replace(/\.html$/i, '');
-  if (p.length > 1) p = p.replace(/\/+$/, '');
-  try { p = decodeURIComponent(p); } catch (_) { /* keep as-is */ }
-  return u.origin + p.toLowerCase();
-}
-
-// Redirected responses cannot be used to answer a navigation; copy the body into a clean one.
-async function clean(response) {
-  if (!response.redirected && response.type !== 'opaqueredirect') return response;
-  const body = await response.blob();
-  return new Response(body, { status: 200, statusText: 'OK', headers: response.headers });
-}
-
-function withTimeout(promise, ms) {
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error('timeout')), ms);
-    promise.then(value => { clearTimeout(timer); resolve(value); }, error => { clearTimeout(timer); reject(error); });
-  });
-}
-
-async function putPage(cache, url, response) {
-  await cache.put(new Request(pageKey(url)), await clean(response));
-}
-
-// Always revalidate with the server (bypasses the browser's HTTP cache, which GitHub Pages
-// fills with max-age=600). Same-origin only; third parties keep their own caching.
-const revalidate = request => fetch(request, { cache: 'no-cache' });
-
-// Store a response, dropping older copies of the same file that differ only by ?v=.
-async function store(cache, request, response) {
-  try { await cache.delete(request, { ignoreSearch: true }); } catch (_) { /* ignore */ }
-  await cache.put(request, response);
-}
-
-// Look a request up ignoring ?v= / ?page= style query strings.
-const lookup = (request, extra) => caches.match(request, Object.assign({ cacheName: CACHE, ignoreSearch: true }, extra));
-
-/* ---------- pre-caching ---------- */
-
-async function cacheFile(cache, url, seen) {
-  if (seen.has(url)) return null;
-  seen.add(url);
-  try {
-    const response = await fetch(new Request(url, { cache: 'reload' }));
-    if (!response || !response.ok) return null;
-    await cache.put(url, response.clone());
-    return response;
-  } catch (_) { return null; }
-}
-
-function extractUrls(text, base, isCss) {
-  const found = new Set();
-  const add = raw => {
-    if (!raw || /^(?:data:|blob:|mailto:|tel:|javascript:|#)/i.test(raw)) return;
-    try { found.add(new URL(raw.trim(), base).href.split('#')[0]); } catch (_) { /* ignore */ }
-  };
-  if (isCss) {
-    text.replace(/url\(\s*(['"]?)([^'")]+)\1\s*\)/gi, (_, __, u) => { add(u); return _; });
-  } else {
-    text.replace(/(?:src|href)\s*=\s*["']([^"']+)["']/gi, (_, u) => { add(u); return _; });
-  }
-  return Array.from(found);
-}
-
-const isStaticAsset = u => /\.(?:css|js|webp|png|jpe?g|gif|svg|ico|woff2?|ttf|json|webmanifest)$/i.test(new URL(u).pathname);
-const isSameOrigin = u => new URL(u).origin === self.location.origin;
-
-async function precache() {
-  const cache = await caches.open(CACHE);
-  const seen = new Set();
-
-  // 1. App shell (static files). HTML is stored under its page key.
-  const shellResults = await Promise.all(SHELL.map(async url => {
-    const response = await cacheFile(cache, url, seen);
-    if (response && /\.html$/i.test(new URL(url).pathname)) await putPage(cache, url, response.clone());
-    return [url, response];
-  }));
-  if (!shellResults.find(([url, r]) => url === OFFLINE_URL && r)) throw new Error('offline.html could not be cached');
-  if (!shellResults.find(([url, r]) => /\/index\.html$/.test(url) && r)) throw new Error('index.html could not be cached');
-
-  // 2. Every page and image listed in the data files.
-  const pages = new Set();
-  const assets = new Set();
-  for (const file of ['assets/data/search-index.json', 'assets/data/posts.json']) {
-    try {
-      const response = await cache.match(scoped(file));
-      const list = response ? await response.json() : [];
-      (Array.isArray(list) ? list : []).forEach(entry => {
-        if (entry && typeof entry.url === 'string') pages.add(entry.url);
-        if (entry && typeof entry.image === 'string' && entry.image) assets.add(scoped(entry.image));
-      });
-    } catch (_) { /* data file unreadable: the shell still works */ }
-  }
-  await Promise.all(Array.from(assets).map(url => cacheFile(cache, url, seen)));
-
-  // 3. Each page, plus the CSS / JS / images it references.
-  const pageUrls = new Set(['index.html'].map(scoped));
-  pages.forEach(u => {
-    const abs = scoped(u);
-    pageUrls.add(/\.html$/i.test(abs) ? abs : (abs.replace(/\/+$/, '') + '.html'));
-  });
-  const discovered = new Set();
-  await Promise.all(Array.from(pageUrls).map(async url => {
-    let response;
-    try { response = await fetch(new Request(url, { cache: 'reload' })); } catch (_) { return; }
-    if (!response || !response.ok) return;
-    await putPage(cache, url, response.clone());
-    try { extractUrls(await response.clone().text(), url, false).forEach(u => discovered.add(u)); } catch (_) { /* ignore */ }
-  }));
-  await Promise.all(Array.from(discovered).filter(u => isSameOrigin(u) && isStaticAsset(u)).map(u => cacheFile(cache, u, seen)));
-
-  // 4. Assets referenced from cached CSS (images, fonts).
-  const cssUrls = Array.from(seen).filter(u => /\.css$/i.test(new URL(u).pathname));
-  const fromCss = new Set();
-  await Promise.all(cssUrls.map(async url => {
-    try {
-      const response = await cache.match(url);
-      if (response) extractUrls(await response.text(), url, true).forEach(u => fromCss.add(u));
-    } catch (_) { /* ignore */ }
-  }));
-  await Promise.all(Array.from(fromCss).filter(isSameOrigin).map(u => cacheFile(cache, u, seen)));
-
-  // 5. Third-party CSS/JS and the fonts they reference (best effort, never fails install).
-  await Promise.all(EXTERNAL.map(async url => {
-    try {
-      let response;
-      try { response = await fetch(new Request(url, { mode: 'cors', credentials: 'omit' })); }
-      catch (_) { response = await fetch(new Request(url, { mode: 'no-cors', credentials: 'omit' })); }
-      if (!response || (!response.ok && response.type !== 'opaque')) return;
-      await cache.put(url, response.clone());
-      if (response.type !== 'opaque' && /css/i.test(response.headers.get('content-type') || '')) {
-        const files = extractUrls(await response.text(), url, true);
-        await Promise.all(files.map(async f => {
-          try {
-            const r = await fetch(new Request(f, { mode: 'no-cors', credentials: 'omit' }));
-            if (r && (r.ok || r.type === 'opaque')) await cache.put(f, r);
-          } catch (_) { /* ignore */ }
-        }));
-      }
-    } catch (_) { /* third-party unreachable: skip */ }
-  }));
-}
-
-/* ---------- lifecycle ---------- */
-
-self.addEventListener('install', event => {
-  event.waitUntil(precache().then(() => self.skipWaiting()));
-});
-
-self.addEventListener('activate', event => {
-  event.waitUntil((async () => {
-    const keys = await caches.keys();
-    await Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key)));
-    if (self.registration.navigationPreload) { try { await self.registration.navigationPreload.disable(); } catch (_) { /* ignore */ } }
-    await self.clients.claim();
-  })());
-});
-
-self.addEventListener('message', event => {
-  const data = event.data || {};
-  if (data.type === 'SKIP_WAITING') self.skipWaiting();
-});
-
-/* ---------- fetch handling ---------- */
-
-async function handleNavigation(request) {
-  const cache = await caches.open(CACHE);
-  try {
-    const response = await withTimeout(fetch(request.url, { cache: 'no-cache', credentials: 'same-origin' }), NETWORK_TIMEOUT);
-    if (response && response.ok && response.type === 'basic') {
-      // Only cache real pages, not the server's 404 page or redirects to other sites.
-      cache.put(new Request(pageKey(request.url)), (await clean(response.clone()))).catch(() => {});
-      return response.redirected ? await clean(response) : response;
-    }
-    if (response && response.status !== 404) return response;
-    const cached = await cache.match(pageKey(request.url));
-    return cached || response;
-  } catch (_) {
-    const cached = await cache.match(pageKey(request.url));
-    if (cached) return cached;
-    const offline = await cache.match(new Request(pageKey(OFFLINE_URL)));
-    return offline || new Response('<!doctype html><meta charset="utf-8"><title>Offline</title><h1>Offline</h1><p>This page is not available without a network connection.</p>',
-      { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } });
-  }
-}
-
-async function networkFirst(request) {
-  const cache = await caches.open(CACHE);
-  try {
-    const response = await withTimeout(revalidate(request), NETWORK_TIMEOUT);
-    if (response && response.ok) store(cache, request, response.clone()).catch(() => {});
-    return response;
-  } catch (_) {
-    const cached = await lookup(request);
-    if (cached) return cached;
-    return new Response('', { status: 504, statusText: 'Offline' });
-  }
-}
-
-async function staleWhileRevalidate(request, event) {
-  const cache = await caches.open(CACHE);
-  const cached = await lookup(request);
-  const sameOrigin = new URL(request.url).origin === self.location.origin;
-  const refresh = (sameOrigin ? revalidate(request) : fetch(request)).then(response => {
-    if (response && (response.ok || response.type === 'opaque')) store(cache, request, response.clone()).catch(() => {});
-    return response;
-  }).catch(() => null);
-  if (cached) { event.waitUntil(refresh); return cached; }
-  const response = await refresh;
-  if (response) return response;
-  if (request.destination === 'image') {
-    const fallback = await lookup(FALLBACK_IMAGE);
-    if (fallback) return fallback;
-  }
-  return new Response('', { status: 504, statusText: 'Offline' });
-}
-
-self.addEventListener('fetch', event => {
-  const request = event.request;
-  if (request.method !== 'GET') return;
-  const url = new URL(request.url);
-  if (!/^https?:$/.test(url.protocol)) return;
-
-  if (url.origin !== self.location.origin) {
-    if (EXTERNAL_HOSTS.indexOf(url.hostname) !== -1) event.respondWith(staleWhileRevalidate(request, event));
-    return; // analytics and other third parties pass through untouched
-  }
-
-  if (request.mode === 'navigate') {
-    event.respondWith(handleNavigation(request));
-    return;
-  }
-
-  // Content data, stylesheets and scripts: network-first so edits show up immediately,
-  // cache only when offline. (Scripts used to be stale-while-revalidate, which served the
-  // OLD script on the first load after every deploy.)
-  if (/\/assets\/data\/[^/]+\.json$/i.test(url.pathname) || /\.(?:css|js|webmanifest)$/i.test(url.pathname)) {
-    event.respondWith(networkFirst(request));
-    return;
-  }
-
-  if (isStaticAsset(url.href)) event.respondWith(staleWhileRevalidate(request, event));
-});
+</html>
