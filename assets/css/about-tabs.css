@@ -177,3 +177,83 @@ body.dark-theme .about-tab[aria-selected="true"] {
     object-fit: contain;
   }
 }
+
+/* ---------- 5. Download Resume PDF button ----------
+   ADDITIVE: the anchor keeps its original inline style attribute and href/download;
+   the !important declarations below only exist to win over that inline style.
+   Uses the same tokens as the tabs / pagination, so Light and Dark (felt) follow the
+   theme switch live. Light: accent fill, rounded. Dark: white fill, sharp corners,
+   inverted on hover (same language as the active tab and pagination). */
+#about-panel-resume a.resume-download {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: .5em;
+  box-sizing: border-box;
+  min-height: 44px;                              /* comfortable touch target */
+  max-width: 100%;
+  margin: 0 0 1rem !important;
+  padding: 0 clamp(16px, 4vw, 24px) !important;
+  font-family: var(--font-jura, 'Jura', sans-serif);
+  font-size: clamp(.78rem, 3.2vw, .875rem);
+  font-weight: 600 !important;
+  line-height: 1.2;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none !important;
+  color: var(--color-bg, #f7f5f2) !important;
+  background: var(--color-accent, #b04008) !important;
+  border: 0;
+  border-radius: var(--radius-sm, 8px) !important;
+  box-shadow: inset 0 0 0 1px var(--color-accent, #b04008), var(--shadow-sm, 0 2px 10px rgba(30, 20, 15, .08));
+  cursor: pointer;
+  transition: background-color var(--motion-fast, 140ms) ease,
+              color var(--motion-fast, 140ms) ease,
+              box-shadow var(--motion-fast, 140ms) ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+#about-panel-resume a.resume-download::before { content: none; }   /* no wavy-underline overlay */
+
+@media (hover: hover) {
+  #about-panel-resume a.resume-download:hover {
+    color: var(--color-accent-strong, #8f3205) !important;
+    background: var(--color-surface-hover, #f4eee8) !important;
+    box-shadow: inset 0 0 0 1px var(--color-accent, #b04008);
+  }
+}
+#about-panel-resume a.resume-download:active { background: var(--color-surface-muted, #f1ebe5) !important; }
+#about-panel-resume a.resume-download:focus { outline: none; }
+#about-panel-resume a.resume-download:focus-visible {
+  outline: 2px solid var(--color-focus, #2563eb);
+  outline-offset: 2px;
+}
+
+/* Dark (felt): sharp corners, hairline ring, white fill that inverts on hover. */
+body.dark-theme #about-panel-resume a.resume-download {
+  color: #000 !important;
+  background: #fff !important;
+  border-radius: 0 !important;
+  letter-spacing: .08em;
+  text-decoration: none !important;
+  box-shadow: inset 0 0 0 1px #fff;
+}
+@media (hover: hover) {
+  body.dark-theme #about-panel-resume a.resume-download:hover {
+    color: #fff !important;
+    background: transparent !important;
+    box-shadow: inset 0 0 0 1px var(--felt-line-strong, rgba(255, 255, 255, .18)), inset 0 0 0 1px #fff;
+  }
+}
+body.dark-theme #about-panel-resume a.resume-download:active { background: #ddd !important; color: #000 !important; }
+
+/* Mobile: full-width, easy-to-tap bar. */
+@media (max-width: 480px) {
+  #about-panel-resume a.resume-download { display: flex !important; width: 100%; letter-spacing: .04em; }
+  body.dark-theme #about-panel-resume a.resume-download { letter-spacing: .05em; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #about-panel-resume a.resume-download { transition: none; }
+}
