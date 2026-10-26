@@ -257,3 +257,25 @@ body.dark-theme #about-panel-resume a.resume-download:active { background: #ddd 
 @media (prefers-reduced-motion: reduce) {
   #about-panel-resume a.resume-download { transition: none; }
 }
+
+/* ---------- 6. Download Resume PDF: icon ----------
+   Font Awesome "download" (already loaded site-wide; Lucide is not part of this project).
+   Inherits the button's text color, so it follows Light / Dark and the hover inversion. */
+#about-panel-resume a.resume-download > i {
+  flex: 0 0 auto;
+  width: 1em;
+  font-size: 1.05em;
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+  transform: translateY(-.04em);                 /* optical centering with uppercase Jura caps */
+  transition: transform var(--motion-fast, 140ms) ease;
+}
+@media (hover: hover) {
+  #about-panel-resume a.resume-download:hover > i { transform: translateY(.06em); }   /* small "drop" cue */
+}
+@media (prefers-reduced-motion: reduce) {
+  #about-panel-resume a.resume-download > i,
+  #about-panel-resume a.resume-download:hover > i { transition: none; transform: none; }
+}
